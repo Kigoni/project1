@@ -23,24 +23,19 @@ const ConferenceSection = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 py-16 px-4 relative overflow-hidden">
-      {/* Abstract Background Shapes */}
-      <div className="absolute inset-0 overflow-hidden opacity-30">
-        <div className="absolute -top-1/2 -left-1/4 w-1/2 h-1/2 bg-purple-200 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/4 -right-1/4 w-1/2 h-1/2 bg-indigo-200 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="max-w-4xl mx-auto relative">
+    <div className=" bg-yellow-500/5 py-16 px-4 relative overflow-hidden">
+      <div className="max-w-5xl mx-auto relative">
         {/* Header Section */}
         <div className="text-center mb-16">
           {/* <h4 className="text-indigo-600 font-semibold mb-4 tracking-wide uppercase">
             Global Academic Initiative
           </h4> */}
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparentbg-[#047857]">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-primary-500">
             Conferences & Workshops
           </h1>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-            Join the world's leading researchers and practitioners in shaping the future of climate health
+            Join the world's leading researchers and practitioners in shaping
+            the future of climate health
           </p>
         </div>
 
@@ -96,7 +91,9 @@ const ConferenceSection = () => {
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-slate-600">+42 Speakers</span>
+                      <span className="text-sm text-slate-600">
+                        +42 Speakers
+                      </span>
                     </div>
                     <a
                       href="https://climatehealthcafe.org/conference-workshop-info"
@@ -160,7 +157,9 @@ const ConferenceSection = () => {
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-slate-600">+12 Experts</span>
+                      <span className="text-sm text-slate-600">
+                        +12 Experts
+                      </span>
                     </div>
                     <a
                       href="https://climatehealthcafe.org/conference-workshop-info"
@@ -224,7 +223,9 @@ const ConferenceSection = () => {
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-slate-600">+28 Presenters</span>
+                      <span className="text-sm text-slate-600">
+                        +28 Presenters
+                      </span>
                     </div>
                     <a
                       href="https://climatehealthcafe.org/conference-workshop-info"
@@ -249,10 +250,6 @@ const ConferenceSection = () => {
 };
 
 export default ConferenceSection;
-
-
-
-
 
 // import React, { useEffect } from "react";
 

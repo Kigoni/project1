@@ -1,43 +1,47 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { BookOpen, Mail } from 'lucide-react';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { BookOpen, Mail } from "lucide-react";
 
 const Footer = () => {
   const { t } = useTranslation();
 
   const navigation = {
     pages: [
-      { name: 'Home', href: '#' },
-      { name: 'About', href: '#about' },
-      { name: 'Features', href: '#features' },
-      { name: 'FAQ', href: '#faq' },
+      { name: "Home", href: "#" },
+      { name: "About", href: "#about" },
+      { name: "Features", href: "#features" },
+      { name: "FAQ", href: "#faq" },
     ],
     utility: [
-      { name: 'Signup', href: '#' },
-      { name: 'Login', href: '#' },
-      { name: '404 Not found', href: '#' },
-      { name: 'Password Reset', href: '#' },
+      { name: "Signup", href: "#" },
+      { name: "Login", href: "#" },
+      { name: "404 Not found", href: "#" },
+      { name: "Password Reset", href: "#" },
     ],
     resources: [
-      { name: 'Support', href: '#' },
-      { name: 'Privacy policy', href: '#' },
-      { name: 'Terms & Conditions', href: '#' },
-      { name: 'Video guide', href: '#' },
+      { name: "Support", href: "#" },
+      { name: "Privacy policy", href: "#" },
+      { name: "Terms & Conditions", href: "#" },
+      { name: "Video guide", href: "#" },
     ],
   };
 
   return (
-    <footer className="bg-indigo-50 text-black">
+    <footer className="bg-primary-500/5 text-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <BookOpen className="h-8 w-8" />
-              <span className="text-black text-xl font-bold">Afrika Journals</span>
+              <span className="text-black text-xl font-bold">
+                Afrika Journals
+              </span>
             </div>
             <p className="text-gray-700 mb-4">
-              Spotlight and elevate African journals. We aim to foster a global appreciation for the intellectual richness and diversity that Africa has to offer.
+              Spotlight and elevate African journals. We aim to foster a global
+              appreciation for the intellectual richness and diversity that
+              Africa has to offer.
             </p>
             <div className="flex items-center space-x-2 text-gray-700">
               <Mail size={20} />

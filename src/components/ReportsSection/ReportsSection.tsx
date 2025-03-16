@@ -76,23 +76,25 @@ const featuredItems: FeaturedItem[] = [
   },
   {
     title: "Mama Cash's Resilience Fund",
-    description: "Funding for initiatives that strengthen resilience and sustainability.",
+    description:
+      "Funding for initiatives that strengthen resilience and sustainability.",
     type: "grant",
     tags: ["Funding", "Resilience"],
     image: "https://example.com/mama-cash-resilience.jpg",
     link: "https://lnkd.in/d7wCyfb4",
     color: "bg-green-100",
     icon: "🌱",
-  
+
     citations: 50,
     views: 1200,
     rating: 4.2,
     publishedDate: "2023-09-01",
-    impactFactor: 6.5
+    impactFactor: 6.5,
   },
   {
     title: "FCDO Forest Governance, Markets and Climate Programming Grant",
-    description: "Funding to support sustainable forest governance and climate initiatives.",
+    description:
+      "Funding to support sustainable forest governance and climate initiatives.",
     type: "grant",
     tags: ["Funding", "Forest", "Climate"],
     image: "https://example.com/fcdo-forest-grant.jpg",
@@ -105,11 +107,12 @@ const featuredItems: FeaturedItem[] = [
     views: 1500,
     rating: 4.5,
     publishedDate: "2023-09-15",
-    impactFactor: 7.0
+    impactFactor: 7.0,
   },
   {
     title: "The Connecting the Unconnected Funding",
-    description: "Supporting initiatives to provide internet access to unconnected communities.",
+    description:
+      "Supporting initiatives to provide internet access to unconnected communities.",
     type: "grant",
     tags: ["Funding", "Connectivity"],
     image: "https://example.com/connecting-unconnected.jpg",
@@ -122,11 +125,12 @@ const featuredItems: FeaturedItem[] = [
     views: 1300,
     rating: 4.3,
     publishedDate: "2023-09-10",
-    impactFactor: 6.8
+    impactFactor: 6.8,
   },
   {
     title: "Race Equity Grants",
-    description: "Funding for projects that promote racial equity and inclusion.",
+    description:
+      "Funding for projects that promote racial equity and inclusion.",
     type: "grant",
     tags: ["Funding", "Equity"],
     image: "https://example.com/race-equity-grant.jpg",
@@ -139,11 +143,12 @@ const featuredItems: FeaturedItem[] = [
     views: 1400,
     rating: 4.6,
     publishedDate: "2023-09-20",
-    impactFactor: 7.2
+    impactFactor: 7.2,
   },
   {
     title: "Gates Foundation Grant for Reducing Preeclampsia Burden",
-    description: "Supporting research to reduce the global burden of preeclampsia.",
+    description:
+      "Supporting research to reduce the global burden of preeclampsia.",
     type: "grant",
     tags: ["Funding", "Healthcare"],
     image: "https://example.com/gates-preeclampsia.jpg",
@@ -156,7 +161,7 @@ const featuredItems: FeaturedItem[] = [
     views: 1600,
     rating: 4.7,
     publishedDate: "2023-09-25",
-    impactFactor: 7.5
+    impactFactor: 7.5,
   },
   {
     title: "UKRI Responsive Mode Partnership",
@@ -1051,7 +1056,10 @@ function ReportsSection() {
       </div>
 
       {/* Resource Items */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div
+        id="blog&funding"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredItems.slice(0, visibleCount).map((item, index) => (
             <a

@@ -23,7 +23,10 @@ const ConferenceSection = () => {
   }, []);
 
   return (
-    <div id ="confrences"className=" bg-yellow-500/5 py-16 px-4 relative overflow-hidden">
+    <div
+      id="conferences"
+      className=" bg-yellow-500/5 py-16 px-4 relative overflow-hidden"
+    >
       <div className="max-w-5xl mx-auto relative">
         {/* Header Section */}
         <div className="text-center mb-16">

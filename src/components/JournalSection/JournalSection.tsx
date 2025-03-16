@@ -12,7 +12,7 @@ const JournalSection = () => {
   return (
     <div className="bg-white">
       {/* Journals Section */}
-      <section className="py-16">
+      <section id="journals" className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-5xl font-bold mb-6 text-primary-600">
@@ -91,7 +91,7 @@ const JournalSection = () => {
       </section>
 
       {/* Articles Section */}
-      <section className="py-16">
+      <section id="articles" className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-5xl font-bold mb-6  text-primary-600">

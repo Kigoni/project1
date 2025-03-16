@@ -98,7 +98,7 @@ const Testimonials = () => {
   );
 
   return (
-    <section className="py-24 " ref={ref}>
+    <section id="testimonials" className="py-24 " ref={ref}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

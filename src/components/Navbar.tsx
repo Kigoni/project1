@@ -3,7 +3,8 @@ import { Menu } from "@headlessui/react";
 import { Search, Globe, X, MenuIcon } from "lucide-react";
 
 function Navbar() {
-  const [language, setLanguage] = useState<string>("EN");  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [language, setLanguage] = useState<string>("EN");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Element[]>([]);
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [atTop, setAtTop] = useState<boolean>(true);
@@ -64,7 +65,7 @@ function Navbar() {
 
   const handleScroll = useCallback(() => {
     const currentScrollPos = window.pageYOffset;
-    
+
     if (currentScrollPos === 0) {
       setIsVisible(true);
       setAtTop(true); // New state to track when at the top
@@ -75,10 +76,10 @@ function Navbar() {
       setIsVisible(true);
       setAtTop(false);
     }
-    
+
     setPrevScrollPos(currentScrollPos);
   }, [prevScrollPos]);
-  
+
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -86,12 +87,12 @@ function Navbar() {
 
   return (
     <>
-    <nav
-  id="navbarTop"
-  className={`backdrop-blur-sm fixed top-0 z-50 transition-all duration-300 w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16 xl:px-56 py-4 ${
-    isVisible ? "translate-y-0" : "-translate-y-full"
-  } ${atTop ? "" : "bg-primary-600"}`} // Remove bg-primary-600 when at the top
->
+      <nav
+        id="navbarTop"
+        className={`backdrop-blur-sm fixed top-0 z-50 transition-all duration-300 w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16 xl:px-56 py-4 ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        } ${atTop ? "" : "bg-primary-600"}`} // Remove bg-primary-600 when at the top
+      >
         <div className="flex items-center justify-between">
           <a
             className="flex-none font-semibold text-xl  focus:outline-none focus:opacity-80"
@@ -103,7 +104,11 @@ function Navbar() {
               alt="Logo"
               className="h-32 w-36 object-contain"
             /> */}
-            <span className={`flex flex-col text-2xl font-bold text-primary-500 ${atTop ? "text-primary-500" : "text-yellow-200"}`}>
+            <span
+              className={`flex flex-col text-2xl font-bold text-primary-500 ${
+                atTop ? "text-primary-500" : "text-yellow-200"
+              }`}
+            >
               <span>Afrika Journals</span>
             </span>
           </a>
@@ -165,13 +170,13 @@ function Navbar() {
                 "Journals",
                 "Articles",
                 "Conferences",
-                "Blog & Funding",               
+                "Blog & Funding",
                 "Testimonials",
                 "FAQ",
               ].map((item) => (
                 <a
                   key={item}
-                  href={`#${item.toLowerCase()}`}
+                  href={`#${item.toLowerCase().replace(/\s+/g, "").trim()}`}
                   className="text-yellow-200 font-semibold hover:text-[#4ADE80]  transition-colors duration-200 relative group"
                 >
                   {item}
@@ -217,16 +222,16 @@ function Navbar() {
         >
           <ul className="flex lg:items-center max-lg:gap-4 max-lg:mb-4  flex-col mt-4 lg:flex-1 md:mt-0 lg:flex-row ">
             {[
-              "Conferences & Workshops",
-              "Blog & Funding",
               "Journals",
               "Articles",
+              "Conferences",
+              "Blog & Funding",
               "Testimonials",
               "FAQ",
             ].map((item) => (
               <li key={item}>
                 <a
-                  href={`#${item.toLowerCase()}`}
+                  href={`#${item.toLowerCase().replace(/\s+/g, "").trim()}`}
                   className="text-yellow-600 text-lg font-normal hover:text-[#4ADE80] transition-all duration-500 mb-2 block lg:mr-6 lg:text-base"
                 >
                   {item}

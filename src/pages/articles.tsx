@@ -27,7 +27,7 @@ import {
   Award,
   Hash,
 } from "lucide-react";
-import { Navbar } from "./layout/Navbar";
+import Navbar from "../components/Navbar";
 
 // Types
 interface Article {
@@ -63,7 +63,7 @@ interface Language {
   name: string;
 }
 
-function App() {
+function ArticlesPage() {
   // States
   const [data, setData] = useState<ApiResponse | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
@@ -423,7 +423,7 @@ function App() {
 
   return (
     <div className="min-h-screen">
-        <Navbar/>
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-green-800 mb-2">
@@ -1123,9 +1123,9 @@ function App() {
           </div>
         </div>
       </div>
-      <footer/>
+      <footer />
     </div>
   );
 }
 
-export default App;
+export default ArticlesPage;

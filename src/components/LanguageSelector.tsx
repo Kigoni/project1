@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Menu } from '@headlessui/react';
 import { Globe2 } from 'lucide-react';

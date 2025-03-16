@@ -17,7 +17,7 @@ const Hero: React.FC = () => {
           <source src="/hero.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 to-green-700/90" />
       </div>
 
       <div className="relative h-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 flex items-center -mt-16">
@@ -86,19 +86,13 @@ const Hero: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Enhanced Wave Effect */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg
-          viewBox="0 0 1440 200"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 200L60 183.3C120 166.7 240 133.3 360 116.7C480 100 600 100 720 116.7C840 133.3 960 166.7 1080 166.7C1200 166.7 1320 133.3 1380 116.7L1440 100V200H1380C1320 200 1200 200 1080 200C960 200 840 200 720 200C600 200 480 200 360 200C240 200 120 200 60 200H0Z"
-            fill="white"
-          />
-        </svg>
-      </div>
+      {/* Gradient Overlay for Bottom Section */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent" />
+
+      {/* Enhanced Wave SVG */}
+      <svg className="fill-white w-full" viewBox="0 0 1440 200" preserveAspectRatio="none">
+        <path d="M0,128L48,117.3C96,107,192,85,288,90.7C384,96,480,128,576,133.3C672,139,768,117,864,101.3C960,85,1056,75,1152,80C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
     </section>
   );
 };

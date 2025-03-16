@@ -40,7 +40,7 @@ const FAQ = () => {
     <section className="py-16 bg-yellow-500/5" ref={ref}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-primary-600 mb-4">
             Frequently Asked Questions
           </h2>
           <p className="text-gray-600">

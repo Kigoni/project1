@@ -1,248 +1,213 @@
-import React, { useState, useEffect } from "react";
-import { TrendingUp, LineChart, BarChart } from "lucide-react";
+import React, { useState } from 'react';
+import { FiFileText as FileText } from 'react-icons/fi';
+import { BsBarChartFill as BarChart, BsAward as Award, BsBook as BookOpen, BsArrowUpRight as ArrowUpRight, BsGlobe2 as Globe2 } from 'react-icons/bs';
+import {BiTrendingUp as TrendingUp } from 'react-icons/bi'; // Import the TrendingUp icon
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
-const Stats = () => {
-  const [isVisible, setIsVisible] = useState(false);
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+const Stats: React.FC = () => {
+  const [metric, setMetric] = useState('Publications');
+
+  // Sample data for the chart
+  const data = {
+    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+    datasets: [
+      {
+        label: metric,
+        data: metric === 'Publications' ? [100, 150, 200, 377] : [50, 120, 180, 250],
+        borderColor: 'rgba(16, 185, 129, 1)', // Complementary green color
+        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+        tension: 0.4,
+        borderWidth: 2,
+        pointBorderWidth: 2,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: `Growth Over Quarters (${metric})`,
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)',
+        },
+      },
+    },
+    elements: {
+      point: {
+        radius: 4,
+        hoverRadius: 6,
+      },
+    },
+  };
 
   return (
-    <div className="container px-8 py-8 mx-auto">
-      {" "}
-      {/* Container div with 70% width */}
-      <div
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 transition-opacity duration-700 ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {/* Yearly Growth Card */}
-        <div className="bg-primary-600 p-6 lg:p-8 rounded-lg relative overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group">
-          <div className="relative z-10">
-            <div className="text-white">
-              <h2 className="text-lg lg:text-xl font-bold mb-2 transform transition-transform group-hover:translate-x-1">
-                YEARLY GROWTH IN
-              </h2>
-              <h3 className="text-lg lg:text-xl mb-2 transform transition-transform delay-75 group-hover:translate-x-1">
-                AFRICAN RESEARCH
-              </h3>
-              <h3 className="text-lg lg:text-xl mb-4 transform transition-transform delay-100 group-hover:translate-x-1">
-                PUBLICATIONS
-              </h3>
-            </div>
-            <div className="flex items-end gap-2 mt-4 transform transition-all duration-300 group-hover:scale-105">
-              <div className="text-[72px] lg:text-[100px] font-bold text-white leading-none">
-                73
+    <div className="bg-slate-50 py-20 relative">
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary-600 mb-4">Research Impact Metrics</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Comprehensive analysis of our research output and impact across various academic metrics</p>
+          </div>
+
+          {/* Floating Stats Cards */}
+          <div className="mb-16">
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+                <div className="group bg-green-400/10 backdrop-blur-2xl rounded-xl p-6 transform hover:scale-105 transition-all duration-300 hover:bg-gradient-radial from-yellow-300 to-green-300
+">
+                  <TrendingUp className="text-black mb-3 group-hover:text-black transition-colors" size={28} />
+                  <div className="text-4xl font-bold text-black mb-2 group-hover:text-green-300 transition-colors">73%</div>
+                  <div className="text-black-200 group-hover:text-black transition-colors">Yearly Growth</div>
+                </div>
+                <div className="group bg-green-400/10 backdrop-blur-3xl rounded-xl p-6 transform hover:scale-105 transition-all duration-300 hover:bg-gradient-radial from-yellow-300 to-green-300
+">
+                  <Award className="text-black mb-3 group-hover:text-black transition-colors" size={28} />
+                  <div className="text-4xl font-bold text-black mb-2 group-hover:text-green-300 transition-colors">2.3K</div>
+                  <div className="text-black-200 group-hover:text-black transition-colors">Research Papers</div>
+                </div>
+                <div className="group bg-green-400/10 backdrop-blur-2xl rounded-xl p-6 transform hover:scale-105 transition-all duration-300 hover:bg-gradient-radial from-yellow-300 to-green-300
+ sm:col-span-2 md:col-span-1">
+                  <Globe2 className="text-black mb-3 group-hover:text-black transition-colors" size={28} />
+                  <div className="text-4xl font-bold text-black mb-2 group-hover:text-green-300 transition-colors">76%</div>
+                  <div className="text-black-200 group-hover:text-black transition-colors">Citation Growth</div>
+                </div>
               </div>
-              <div className="text-[36px] lg:text-[50px] font-bold text-white leading-none mb-2">
-                %
+            </div>
+          </div>
+
+          {/* Academic Growth Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+            <div className="group bg-white rounded-2xl p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-800 group-hover:text-green-700 transition-colors">Publication Growth</h3>
+                <div className="p-3 bg-green-50 rounded-full group-hover:bg-green-100 transition-colors">
+                  <FileText className="text-green-600" size={24} />
+                </div>
               </div>
-            </div>
-            <div className="mt-4 text-white/90 text-sm transform transition-transform delay-150 group-hover:translate-x-1">
-              Year-over-Year Growth 2024-2025
-            </div>
-          </div>
-          <div className="absolute top-4 right-4 w-32 h-32 lg:w-40 lg:h-40 opacity-10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
-            <TrendingUp className="w-full h-full" />
-          </div>
-        </div>
-
-        {/* Quarterly Growth Chart */}
-        <div className="bg-white rounded-lg p-6 lg:p-8 border-2 border-green-400 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group">
-          <div className="text-primary-600 mb-4">
-            <h2 className="text-lg lg:text-xl font-bold transform transition-transform group-hover:translate-x-1">
-              PUBLICATION GROWTH
-            </h2>
-            <div className="text-yellow-500 font-bold mt-2 transform transition-transform delay-75 group-hover:translate-x-1">
-              Q1 2025: ALL-TIME HIGH
-            </div>
-          </div>
-          <div className="relative h-[180px] lg:h-[220px] mt-6 transition-transform duration-500 group-hover:scale-[1.02]">
-            <svg
-              className="w-full h-full"
-              viewBox="0 0 460 250"
-              preserveAspectRatio="none"
-            >
-              {/* Background Grid */}
-              {[0, 1, 2, 3, 4].map((i) => (
-                <line
-                  key={`grid-${i}`}
-                  x1="40"
-                  y1={50 + i * 40}
-                  x2="420"
-                  y2={50 + i * 40}
-                  stroke="#e5e7eb"
-                  strokeWidth="1"
-                  strokeDasharray="4"
-                  className="transition-opacity duration-300 group-hover:opacity-50"
-                />
-              ))}
-
-              {/* Data Line */}
-              <path
-                d="M 50,180 L 140,150 L 230,120 L 320,90 L 410,40"
-                fill="none"
-                stroke="#4ade80"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="transition-all duration-500"
-                style={{
-                  strokeDasharray: "1000",
-                  strokeDashoffset: isVisible ? "0" : "1000",
-                }}
-              />
-
-              {/* Data Points */}
-              {[
-                { x: 50, y: 180, value: 250 },
-                { x: 140, y: 150, value: 285 },
-                { x: 230, y: 120, value: 320 },
-                { x: 320, y: 90, value: 345 },
-                { x: 410, y: 40, value: 377 },
-              ].map((point, i) => (
-                <g
-                  key={`point-${i}`}
-                  className="transform transition-transform duration-300 group-hover:scale-110"
+              <div className="flex justify-center mb-4">
+                <button
+                  onClick={() => setMetric('Publications')}
+                  className={`px-4 py-2 mx-1 rounded-full text-sm ${
+                    metric === 'Publications' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-600'
+                  }`}
                 >
-                  <circle
-                    cx={point.x}
-                    cy={point.y}
-                    r="6"
-                    fill="#4ade80"
-                    stroke="white"
-                    strokeWidth="2"
-                    className="transition-all duration-300 group-hover:r-8"
-                  />
-                  <text
-                    x={point.x}
-                    y={point.y - 15}
-                    textAnchor="middle"
-                    className="text-xs font-bold fill-yellow-500 transition-all duration-300 group-hover:font-extrabold"
-                  >
-                    {point.value}
-                  </text>
-                </g>
-              ))}
+                  Publications
+                </button>
+                <button
+                  onClick={() => setMetric('Citations')}
+                  className={`px-4 py-2 mx-1 rounded-full text-sm ${
+                    metric === 'Citations' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-600'
+                  }`}
+                >
+                  Citations
+                </button>
+              </div>
+              <div className="text-5xl font-bold text-green-600 mb-2 group-hover:scale-105 transform transition-transform">
+                {metric === 'Publications' ? 377 : 250}
+              </div>
+              <div className="text-gray-600 mb-6">Q1 2025: All-time High</div>
+              <div className="relative h-[200px] bg-slate-50 rounded-lg p-4 overflow-hidden group-hover:shadow-inner transition-shadow">
+                <div className="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-green-500/20 to-transparent rounded-b-lg"></div>
+                <Line data={data} options={options} />
+              </div>
+            </div>
 
-              {/* X-Axis Labels */}
-              {["Q1 2024", "Q2 2024", "Q3 2024", "Q4 2024", "Q1 2025"].map(
-                (label, i) => (
-                  <text
-                    key={`label-${i}`}
-                    x={50 + i * 90}
-                    y="220"
-                    textAnchor="middle"
-                    className="text-xs fill-[#34D399] transition-transform duration-300 group-hover:translate-y-1"
-                  >
-                    {label}
-                  </text>
-                )
-              )}
-            </svg>
-          </div>
-        </div>
-
-        {/* Research Metrics */}
-        <div className="grid gap-4">
-          {/* Academic Growth Stats */}
-          <div className="bg-white p-6 rounded-lg border-2 border-green-400 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group">
-            <h3 className="text-primary-600 text-lg font-bold mb-6 transform transition-transform group-hover:translate-x-1">
-              RESEARCH METRICS
-            </h3>
-            <div className="space-y-6">
-              {/* High Quality Research */}
-              <div className="transform transition-all duration-300 hover:translate-x-1">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-primary-600 font-semibold">
-                    High Impact Publications
-                  </span>
-                  <span className="text-yellow-500 font-bold">73%</span>
-                </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary-600 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: isVisible ? "73%" : "0%" }}
-                  />
+            <div className="group bg-white rounded-2xl p-8 hover:shadow-xl transition-all duration-300 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-800 group-hover:text-green-700 transition-colors">Research Impact</h3>
+                <div className="p-3 bg-green-50 rounded-full group-hover:bg-green-100 transition-colors">
+                  <BarChart className="text-green-600" size={24} />
                 </div>
               </div>
-              {/* Advanced Studies */}
-              <div className="transform transition-all duration-300 hover:translate-x-1">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-primary-600 font-semibold">
-                    Peer-Reviewed Articles
-                  </span>
-                  <span className="text-yellow-500 font-bold">85%</span>
+
+              <div className="space-y-8">
+                <div className="group/item">
+                  <div className="flex justify-between mb-3">
+                    <span className="text-gray-700 group-hover/item:text-green-700 transition-colors flex items-center gap-2">
+                      <Award className="w-4 h-4" />
+                      High Impact Publications
+                    </span>
+                    <span className="text-green-600 font-semibold">73%</span>
+                  </div>
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transform origin-left transition-transform duration-1000 group-hover/item:scale-x-110"
+                      style={{ width: '73%' }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary-600 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: isVisible ? "85%" : "0%" }}
-                  />
+
+                <div className="group/item">
+                  <div className="flex justify-between mb-3">
+                    <span className="text-gray-700 group-hover/item:text-green-700 transition-colors flex items-center gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      Peer-Reviewed Articles
+                    </span>
+                    <span className="text-green-600 font-semibold">85%</span>
+                  </div>
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transform origin-left transition-transform duration-1000 group-hover/item:scale-x-110"
+                      style={{ width: '85%' }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="group/item">
+                  <div className="flex justify-between mb-3">
+                    <span className="text-gray-700 group-hover/item:text-green-700 transition-colors flex items-center gap-2">
+                      <Globe2 className="w-4 h-4" />
+                      Collaborative Projects
+                    </span>
+                    <span className="text-green-600 font-semibold">68%</span>
+                  </div>
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transform origin-left transition-transform duration-1000 group-hover/item:scale-x-110"
+                      style={{ width: '68%' }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="group/item">
+                  <div className="flex justify-between mb-3">
+                    <span className="text-gray-700 group-hover/item:text-green-700 transition-colors flex items-center gap-2">
+                      <ArrowUpRight className="w-4 h-4" />
+                      Grant Awards
+                    </span>
+                    <span className="text-green-600 font-semibold">90%</span>
+                  </div>
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transform origin-left transition-transform duration-1000 group-hover/item:scale-x-110"
+                      style={{ width: '90%' }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Impact Metrics */}
-          <div className="bg-primary-600 p-6 rounded-lg transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group">
-            <div className="space-y-6">
-              <div className="transform transition-all duration-300 hover:translate-x-1">
-                <div className="text-2xl font-bold text-white mb-1">76%</div>
-                <div className="text-sm text-white">CITATION GROWTH</div>
-                <div className="h-2 bg-white/30 mt-2 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-white rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: isVisible ? "76%" : "0%" }}
-                  />
-                </div>
-              </div>
-              <div className="transform transition-all duration-300 hover:translate-x-1">
-                <div className="text-2xl font-bold text-white mb-1">73%</div>
-                <div className="text-sm text-white">
-                  INTERNATIONAL COLLABORATION
-                </div>
-                <div className="h-2 bg-white/30 mt-2 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-white rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: isVisible ? "73%" : "0%" }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Publications Overview */}
-        <div className="bg-primary-600 p-6 lg:p-8 col-span-1 md:col-span-2 lg:col-span-2 rounded-lg transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div>
-              <h2 className="text-white text-lg mb-2 transform transition-transform group-hover:translate-x-1">
-                TOTAL PUBLISHED
-              </h2>
-              <div className="text-white text-4xl lg:text-5xl font-bold flex items-baseline gap-2 transform transition-all duration-300 group-hover:scale-105">
-                2.3K
-                <span className="text-sm font-normal opacity-90">
-                  RESEARCH PAPERS
-                </span>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <div className="transform transition-all duration-300 hover:translate-x-1">
-                  <div className="text-white/90 text-sm">Monthly Growth</div>
-                  <div className="text-white text-xl font-bold">+12.5%</div>
-                </div>
-                <div className="transform transition-all duration-300 hover:translate-x-1">
-                  <div className="text-white/90 text-sm">Year-over-Year</div>
-                  <div className="text-white text-xl font-bold">+73%</div>
-                </div>
-              </div>
-            </div>
-            <div className="relative group-hover:rotate-12 transition-transform duration-500">
-              <div className="absolute inset-0 bg-white/10 rounded-full"></div>
-              <BarChart className="text-white w-16 h-16 lg:w-20 lg:h-20 relative z-10" />
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>

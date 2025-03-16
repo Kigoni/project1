@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Menu } from "@headlessui/react";
 import { Search, Globe, X, MenuIcon } from "lucide-react";
 
 function Navbar() {
-  const [language, setLanguage] = useState<string>("EN");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [language, setLanguage] = useState<string>("EN");  const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Element[]>([]);
   const [showSearch, setShowSearch] = useState<boolean>(false);
+  const [atTop, setAtTop] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [prevScrollPos, setPrevScrollPos] = useState<number>(0);
 
@@ -62,49 +62,48 @@ function Navbar() {
     setShowSearch(false);
   };
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     const currentScrollPos = window.pageYOffset;
-
+    
     if (currentScrollPos === 0) {
       setIsVisible(true);
+      setAtTop(true); // New state to track when at the top
     } else if (currentScrollPos > prevScrollPos) {
       setIsVisible(false);
+      setAtTop(false);
     } else {
       setIsVisible(true);
+      setAtTop(false);
     }
-
+    
     setPrevScrollPos(currentScrollPos);
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setIsVisible(true);
-  };
-
+  }, [prevScrollPos]);
+  
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [prevScrollPos]);
+  }, [handleScroll]);
 
   return (
     <>
-      <nav
-        className={`backdrop-blur-sm fixed top-0 z-50 transition-all duration-300  w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16 xl:px-56 py-4 ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
+    <nav
+  id="navbarTop"
+  className={`backdrop-blur-sm fixed top-0 z-50 transition-all duration-300 w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16 xl:px-56 py-4 ${
+    isVisible ? "translate-y-0" : "-translate-y-full"
+  } ${atTop ? "" : "bg-primary-600"}`} // Remove bg-primary-600 when at the top
+>
         <div className="flex items-center justify-between">
           <a
-            className="flex-none font-semibold text-xl text-red-600 focus:outline-none focus:opacity-80"
+            className="flex-none font-semibold text-xl  focus:outline-none focus:opacity-80"
             href="/"
             aria-label="Prominent Australia"
           >
             {/* <img
               src="/logo.png"
               alt="Logo"
-              className="h-16 w-36 object-contain"
+              className="h-32 w-36 object-contain"
             /> */}
-            <span className="flex flex-col text-2xl font-bold bg-green-500 bg-clip-text text-transparent">
+            <span className={`flex flex-col text-2xl font-bold text-primary-500 ${atTop ? "text-primary-500" : "text-yellow-200"}`}>
               <span>Afrika Journals</span>
             </span>
           </a>
@@ -163,17 +162,17 @@ function Navbar() {
           <div className="overflow-hidden overflow-y-auto max-h-[75vh] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             <div className="space-x-8 md:py-0 flex flex-col md:flex-row md:items-center md:justify-end gap-0.5 md:gap-1 font-semibold">
               {[
-                "Conferences & Workshops",
-                "Blog & Funding",
                 "Journals",
                 "Articles",
+                "Conferences",
+                "Blog & Funding",               
                 "Testimonials",
                 "FAQ",
               ].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
-                  className="text-yellow-200 hover:text-[#4ADE80] font-medium transition-colors duration-200 relative group"
+                  className="text-yellow-200 font-semibold hover:text-[#4ADE80]  transition-colors duration-200 relative group"
                 >
                   {item}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#34D399] transition-all duration-200 group-hover:w-full" />

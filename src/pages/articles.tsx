@@ -76,11 +76,6 @@ function ArticlesPage() {
     "keywords"
   );
   const [showFilterModal, setShowFilterModal] = useState(false);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [thematicAreasData, setThematicAreasData] = useState<ThematicArea[]>(
-    []
-  );
-  const [languagesData, setLanguagesData] = useState<Language[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedThematicAreas, setSelectedThematicAreas] = useState<string[]>(
     []
@@ -220,159 +215,142 @@ function ArticlesPage() {
     "Afrikaans",
   ];
 
+  // const fetchArticles = useCallback(async () => {
+  //   try {
+  //     setLoading(true);
+  //     const queryParams = new URLSearchParams();
+  //     if (searchQuery) queryParams.append("q", searchQuery);
+  //     queryParams.append("searchBy", searchMode);
+  //     queryParams.append("page", page.toString());
+  //     queryParams.append("page_size", pageSize.toString());
+
+  //     Object.entries(filters).forEach(([key, value]) => {
+  //       if (value) queryParams.append(key, "true");
+  //     });
+  //     const response = await axios.get<ApiResponse>(
+  //       `https://backend.afrikajournals.org/journal_api/articles/search?${queryParams.toString()}`
+  //     );
+  //     const data = response.data;
+
+  //     // Map the API response to the Article type
+  //     const mappedArticles = data.results.map((article: Article) => ({
+  //       id: article.id,
+  //       title: article.title,
+  //       abstract: article.abstract,
+  //       authors: article.authors,
+  //       keywords: article.keywords || "",
+  //       doi: article.doi,
+  //       citations: article.citations,
+  //       peer_reviewed: true, // Assuming all articles are peer-reviewed
+  //       publication_date: article.publication_date,
+  //       language: "English", // Assuming all articles are in English
+  //       country: "Kenya", // Assuming all articles are from Kenya
+  //       thematic_area: "", // Assuming no thematic area is provided
+  //     }));
+  //     console.log(mappedArticles);
+
+  //     setArticles(mappedArticles);
+  //     setFilteredArticles(mappedArticles);
+  //     setData(response.data);
+  //     setLoading(false);
+  //   } catch (err) {
+  //     setError("Failed to fetch articles. Please try again later.");
+  //     setLoading(false);
+  //     console.error("Error fetching articles:", err);
+  //   }
+  // }, [filters, searchQuery, searchMode, page, pageSize]);
+
   const fetchArticles = useCallback(async () => {
     try {
+      setShowFilterModal(false);
       setLoading(true);
+
+      // Combine search query with filters
+      let combinedQuery = searchQuery;
+
+      const allFilters = [
+        ...selectedLanguages,
+        ...selectedCountries,
+        ...selectedThematicAreas,
+      ];
+
+      if (allFilters.length > 0) {
+        const filtersString = allFilters.join(" ");
+        combinedQuery = combinedQuery
+          ? `${combinedQuery} ${filtersString}`
+          : filtersString;
+      }
+
+      const encodedQuery = combinedQuery.trim();
+
       const queryParams = new URLSearchParams();
-      if (searchQuery) queryParams.append("q", searchQuery);
-      queryParams.append("searchBy", searchMode);
+      if (combinedQuery) queryParams.append("query", encodedQuery);
+      // queryParams.append("searchBy", searchMode);
       queryParams.append("page", page.toString());
       queryParams.append("page_size", pageSize.toString());
 
+      // Append checkbox filters as query params
       Object.entries(filters).forEach(([key, value]) => {
         if (value) queryParams.append(key, "true");
       });
+
       const response = await axios.get<ApiResponse>(
         `https://backend.afrikajournals.org/journal_api/articles/search?${queryParams.toString()}`
       );
+
       const data = response.data;
 
-      // Map the API response to the Article type
       const mappedArticles = data.results.map((article: Article) => ({
-        id: article.id,
-        title: article.title,
-        abstract: article.abstract,
-        authors: article.authors,
+        ...article,
         keywords: article.keywords || "",
-        doi: article.doi,
-        citations: article.citations,
-        peer_reviewed: true, // Assuming all articles are peer-reviewed
-        publication_date: article.publication_date,
-        language: "English", // Assuming all articles are in English
-        country: "Kenya", // Assuming all articles are from Kenya
-        thematic_area: "", // Assuming no thematic area is provided
+        peer_reviewed: true,
+        language: selectedCountries[0] || "English",
+        country: selectedCountries[0] || "Kenya",
+        thematic_area: article.thematic_area || "",
       }));
-      console.log(mappedArticles);
 
       setArticles(mappedArticles);
       setFilteredArticles(mappedArticles);
-      setData(response.data);
+      setData(data);
       setLoading(false);
     } catch (err) {
       setError("Failed to fetch articles. Please try again later.");
       setLoading(false);
       console.error("Error fetching articles:", err);
     }
-  }, [filters, searchQuery, searchMode, page, pageSize]);
-
-  // Fetch articles
-  useEffect(() => {
-    fetchArticles();
-  }, [filters, searchQuery, searchMode, page, pageSize, fetchArticles]);
-
-  // Filter articles based on search query and filters
-  useEffect(() => {
-    if (
-      !searchQuery &&
-      selectedCountries.length === 0 &&
-      selectedThematicAreas.length === 0 &&
-      selectedLanguages.length === 0
-    ) {
-      setFilteredArticles(articles);
-      return;
-    }
-
-    const fetchFilterData = async () => {
-      try {
-        const [countriesRes, thematicRes, languagesRes] = await Promise.all([
-          fetch("https://aphrc.site/journal_api/api/country/"),
-          fetch("https://aphrc.site/journal_api/api/thematic/"),
-          fetch("https://aphrc.site/journal_api/api/languages/"),
-        ]);
-        const countriesData: Country[] = await countriesRes.json();
-        const thematicAreasData: ThematicArea[] = await thematicRes.json();
-        const languagesData: Language[] = await languagesRes.json();
-        setCountries(countriesData);
-        setThematicAreasData(thematicAreasData);
-        setLanguagesData(languagesData);
-        // Map the countries, thematic areas, and languages data to the selected filters
-        setSelectedCountries(countriesData.map((country) => country.name));
-        setSelectedThematicAreas(thematicAreasData.map((area) => area.name));
-        setSelectedLanguages(languagesData.map((language) => language.name));
-      } catch (error) {
-        console.error("Error fetching filter data:", error);
-      }
-    };
-    fetchFilterData(); // Call the function
-    // const filtered = articles.filter(article => {
-    // // Search query filter
-    // const matchesSearch = searchQuery
-    // ? searchMode === 'abstract'
-    // ? article.abstract.toLowerCase().includes(searchQuery.toLowerCase())
-    // : (article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    // article.keywords?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    // article.thematic_area.toLowerCase().includes(searchQuery.toLowerCase()))
-    // : true;
-
-    // // Country filter
-    // const matchesCountry = selectedCountries.length > 0
-    // ? selectedCountries.includes(article.country)
-    // : true;
-
-    // // Thematic area filter
-    // const matchesThematicArea = selectedThematicAreas.length > 0
-    // ? selectedThematicAreas.includes(article.thematic_area)
-    // : true;
-
-    // // Language filter
-    // const matchesLanguage = selectedLanguages.length > 0
-    // ? selectedLanguages.includes(article.language)
-    // : true;
-
-    // return matchesSearch && matchesCountry && matchesThematicArea && matchesLanguage;
-    // });
-    const filtered = articles.filter((article) => {
-      // Search query filter
-      const matchesSearch = searchQuery
-        ? searchMode === "abstract"
-          ? article.abstract.includes(searchQuery)
-          : article.keywords?.includes(searchQuery)
-        : true;
-      // Country filter
-      const matchesCountry =
-        selectedCountries.length === 0 ||
-        selectedCountries.includes(article.country);
-      // Thematic area filter
-      const matchesThematicArea =
-        selectedThematicAreas.length === 0 ||
-        selectedThematicAreas.includes(article.thematic_area);
-      // Language filter
-      const matchesLanguage =
-        selectedLanguages.length === 0 ||
-        selectedLanguages.includes(article.language);
-      return (
-        matchesSearch &&
-        matchesCountry &&
-        matchesThematicArea &&
-        matchesLanguage
-      );
-    });
-
-    setFilteredArticles(filtered);
   }, [
+    filters,
     searchQuery,
     searchMode,
+    page,
+    pageSize,
     selectedCountries,
     selectedThematicAreas,
     selectedLanguages,
-    articles,
   ]);
 
-  // Filter countries based on search
-  const filteredCountries = africanCountries.filter((country) =>
-    country.toLowerCase().includes(countrySearch.toLowerCase())
-  );
+  // Fetch articles
+  // useEffect(() => {
+  //   fetchArticles();
+  // }, [filters, searchQuery, searchMode, page, pageSize, fetchArticles]);
 
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchArticles();
+    }, 1500); // 1.5 seconds delay
+
+    return () => clearTimeout(delayDebounce);
+  }, [
+    searchQuery,
+    selectedCountries,
+    selectedThematicAreas,
+    selectedLanguages,
+    filters,
+    page,
+    pageSize,
+    searchMode,
+    fetchArticles,
+  ]);
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -413,6 +391,24 @@ function ArticlesPage() {
   // Toggle article expansion
   const toggleArticleExpansion = (id: number) => {
     setExpandedArticleId(expandedArticleId === id ? null : id);
+  };
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setSelectedCountries([]);
+    setSelectedThematicAreas([]);
+    setSelectedLanguages([]);
+    setFilters({
+      Present_on_ISSN: false,
+      african_index_medicus: false,
+      directory_of_african_journals: false,
+      hosted_on_INASPS: false,
+      indexed_on_google_scholar: false,
+      member_of_Committee_on_publication_Ethics: false,
+      online_publisher_in_africa: false,
+      open_access_journal: false,
+    });
+    setPage(1);
+    fetchArticles(); // Re-fetch with cleared filters
   };
 
   // Pagination logic
@@ -488,10 +484,11 @@ function ArticlesPage() {
               <button
                 className="p-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center"
                 onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCountries([]);
-                  setSelectedThematicAreas([]);
-                  setSelectedLanguages([]);
+                  // setSearchQuery("");
+                  // setSelectedCountries([]);
+                  // setSelectedThematicAreas([]);
+                  // setSelectedLanguages([]);
+                  handleClearFilters();
                 }}
               >
                 <RefreshCw className="h-5 w-5 mr-2" />
@@ -596,34 +593,40 @@ function ArticlesPage() {
                     />
                   </div>
                   <div className="max-h-60 overflow-y-auto">
-                    {filteredCountries.map((country) => (
-                      <div key={country} className="flex items-center mb-2">
-                        <input
-                          type="checkbox"
-                          id={`country-${country}`}
-                          checked={selectedCountries.includes(country)}
-                          onChange={() => {
-                            if (selectedCountries.includes(country)) {
-                              setSelectedCountries(
-                                selectedCountries.filter((c) => c !== country)
-                              );
-                            } else {
-                              setSelectedCountries([
-                                ...selectedCountries,
-                                country,
-                              ]);
-                            }
-                          }}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <label
-                          htmlFor={`country-${country}`}
-                          className="ml-2 text-sm text-gray-700"
-                        >
-                          {country}
-                        </label>
-                      </div>
-                    ))}
+                    {africanCountries
+                      .filter((country) =>
+                        country
+                          .toLowerCase()
+                          .includes(countrySearch.toLowerCase())
+                      )
+                      .map((country) => (
+                        <div key={country} className="flex items-center mb-2">
+                          <input
+                            type="checkbox"
+                            id={`country-${country}`}
+                            checked={selectedCountries.includes(country)}
+                            onChange={() => {
+                              if (selectedCountries.includes(country)) {
+                                setSelectedCountries(
+                                  selectedCountries.filter((c) => c !== country)
+                                );
+                              } else {
+                                setSelectedCountries([
+                                  ...selectedCountries,
+                                  country,
+                                ]);
+                              }
+                            }}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label
+                            htmlFor={`country-${country}`}
+                            className="ml-2 text-sm text-gray-700"
+                          >
+                            {country}
+                          </label>
+                        </div>
+                      ))}
                   </div>
                 </div>
 
@@ -718,7 +721,7 @@ function ArticlesPage() {
                 </button>
                 <button
                   className="px-4 py-2 bg-yellow-200 text-black rounded-lg hover:bg-yellow-400 transition-colors"
-                  onClick={() => setShowFilterModal(false)}
+                  onClick={() => fetchArticles()}
                 >
                   Apply Filters
                 </button>

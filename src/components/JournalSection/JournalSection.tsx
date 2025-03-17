@@ -7,6 +7,7 @@ import {
   BookPlus,
   FilePlus,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const JournalSection = () => {
   return (
@@ -147,11 +148,12 @@ const JournalSection = () => {
                   <p className="text-gray-200 text-base mb-6">
                     {item.description}
                   </p>
-                  <button
+                  <Link
+                    to="/articles"
                     className={`flex items-center gap-2 text-white bg-gradient-to-r ${item.color} px-6 py-3 rounded-full w-fit group-hover:gap-3 transition-all`}
                   >
                     Get Started <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}

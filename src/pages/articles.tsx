@@ -304,7 +304,7 @@ function ArticlesPage() {
         ...article,
         keywords: article.keywords || "",
         peer_reviewed: true,
-        language: selectedCountries[0] || "English",
+        language: selectedLanguages[0] || "English",
         country: selectedCountries[0] || "Kenya",
         thematic_area: article.thematic_area || "",
       }));

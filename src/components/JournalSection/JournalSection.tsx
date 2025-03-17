@@ -79,11 +79,12 @@ const JournalSection = () => {
                   <p className="text-gray-200 text-sm mb-4">
                     {item.description}
                   </p>
-                  <button
+                  <Link
+                    to="/journals"
                     className={`flex items-center gap-2 text-white bg-gradient-to-r ${item.color} px-4 py-2 rounded-full w-fit group-hover:gap-3 transition-all text-sm`}
                   >
                     Explore <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}

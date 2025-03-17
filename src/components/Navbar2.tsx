@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Menu } from "@headlessui/react";
+import { Listbox, Menu } from "@headlessui/react";
 import { Search, Globe, X, MenuIcon } from "lucide-react";
 
 function Navbar2() {
@@ -99,44 +99,50 @@ function Navbar2() {
             href="/"
             aria-label="Prominent Australia"
           >
-            {/* <img
+            <img
               src="/logo.png"
               alt="Logo"
               className="h-32 w-36 object-contain"
-            /> */}
-            <span
-              className={`flex flex-col text-2xl font-bold text-primary-500 ${
-                atTop ? "text-primary-500" : "text-yellow-200"
-              }`}
-            >
-              <span>Afrika Journals</span>
-            </span>
+            />
+          <span
+  className={`flex flex-col text-2xl font-bold text-primary-500 ${
+    atTop ? "text-primary-500" : "text-yellow-200"
+  } text-center leading-tight`}
+>
+  <span>Afrika</span>
+  <span>Journals</span>
+</span>
+
+
+
+
+
           </a>
           {/* Collapse Button */}
           <div className="md:hidden flex items-center space-x-4">
-            <Menu as="div" className="flex items-center">
-              <Menu.Button className="p-2 rounded-full bg-green-500 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                <Globe className="h-5 w-5" strokeWidth={2.5} />
-              </Menu.Button>
-              <Menu.Items className="mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
-                {languages.map((lang: Language) => (
-                  <Menu.Item key={lang.code}>
-                    {({ active }) => (
-                      <button
-                        onClick={() => changeLanguage(lang.code, lang.label)}
-                        className={`${
-                          active
-                            ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
-                            : "text-gray-700"
-                        } flex w-full px-4 py-2 text-sm font-medium transition-colors duration-150`}
-                      >
-                        {lang.label}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
-              </Menu.Items>
-            </Menu>
+          <Menu as="div" className="relative mr-4">
+  <Menu.Button className="p-2 rounded-full bg-green-500 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
+    <Globe className="h-5 w-5" strokeWidth={2.5} />
+  </Menu.Button>
+  <Menu.Items className="mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
+    {languages.map((lang: Language) => (
+      <Menu.Item key={lang.code}>
+        {({ active }) => (
+          <button
+            onClick={() => changeLanguage(lang.code, lang.label)}
+            className={`${
+              active
+                ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
+                : "text-gray-700"
+            } flex w-full px-4 py-2 text-sm font-medium transition-colors duration-150`}
+          >
+            {lang.label}
+          </button>
+        )}
+      </Menu.Item>
+    ))}
+  </Menu.Items>
+</Menu>
             <button
               type="button"
               className="hs-collapse-toggle relative size-9 flex justify-center items-center text-sm font-semibold rounded-lg border border-yellow-200 text-yellow-200 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
@@ -183,34 +189,59 @@ function Navbar2() {
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#34D399] transition-all duration-200 group-hover:w-full" />
                 </a>
               ))}
-              <Menu as="div" className="relative">
-                <Menu.Button className="p-2 rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                  <Globe className="h-5 w-5" strokeWidth={2.5} />
-                </Menu.Button>
-                <Menu.Items className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
-                  {languages.map((lang: Language) => (
-                    <Menu.Item key={lang.code}>
-                      {({ active }) => (
-                        <button
-                          onClick={() => changeLanguage(lang.code, lang.label)}
-                          className={`${
-                            active
-                              ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
-                              : "text-gray-700"
-                          } flex w-full px-4 py-2 text-sm font-medium transition-colors duration-150`}
-                        >
-                          {lang.label}
-                        </button>
-                      )}
-                    </Menu.Item>
-                  ))}
-                </Menu.Items>
-              </Menu>
+              {/* <Menu as="div" className="relative mr-4">
+  <Menu.Button className="p-2 rounded-full bg-green-500 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
+    <Globe className="h-5 w-5" strokeWidth={2.5} />
+  </Menu.Button>
+  <Menu.Items className="mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
+    {languages.map((lang: Language) => (
+      <Menu.Item key={lang.code}>
+        {({ active }) => (
+          <button
+            onClick={() => changeLanguage(lang.code, lang.label)}
+            className={`${
+              active
+                ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
+                : "text-gray-700"
+            } flex w-full px-4 py-2 text-sm font-medium transition-colors duration-150`}
+          >
+            {lang.label}
+          </button>
+        )}
+      </Menu.Item>
+    ))}
+  </Menu.Items>
+</Menu> */}
+<Menu as="div" className="relative inline-block text-left">
+  <Menu.Button className="p-2 rounded-full bg-green-500 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
+    <Globe className="h-5 w-5" strokeWidth={2.5} />
+  </Menu.Button>
+  <Menu.Items className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
+    <div className="py-4">
+      {languages.map((lang: Language) => (
+        <Menu.Item key={lang.code}>
+          {({ active }) => (
+            <button
+              onClick={() => changeLanguage(lang.code, lang.label)}
+              className={`${
+                active
+                  ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
+                  : "text-gray-700"
+              } flex w-full px-4 py-2 text-sm font-medium transition-colors duration-150`}
+            >
+              {lang.label}
+            </button>
+          )}
+        </Menu.Item>
+      ))}
+    </div>
+  </Menu.Items>
+</Menu>
 
               <button
                 onClick={handleSearchClick}
-                className="p-2 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
-              >
+                className="p-2 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg relative z-10"
+                >
                 <Search className="h-4 w-4" strokeWidth={2} />
               </button>
             </div>

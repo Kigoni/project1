@@ -94,23 +94,27 @@ function Navbar() {
         } ${atTop ? "" : "bg-primary-600"}`} // Remove bg-primary-600 when at the top
       >
         <div className="flex items-center justify-between">
-          <a
-            className="flex-none font-semibold text-xl  focus:outline-none focus:opacity-80"
-            href="/"
-            aria-label="Prominent Australia"
-          >
-            {/* <img
-              src="/logo.png"
-              alt="Logo"
-              className="h-32 w-36 object-contain"
-            /> */}
-            <span
-              className={`flex flex-col text-2xl font-bold text-primary-500 ${
-                atTop ? "text-primary-500" : "text-yellow-200"
-              }`}
-            >
-              <span>Afrika Journals</span>
-            </span>
+  <a
+    className="flex items-center gap-x-4 font-semibold text-xl focus:outline-none focus:opacity-80"
+    href="/"
+    aria-label="Prominent Australia"
+  >
+    {/* Logo */}
+    <img
+      src="/logo.png"
+      alt="Logo"
+      className="h-20 w-24 object-contain opacity-75 hover:opacity-90 transition-opacity"
+    />
+
+    {/* Afrika Journals Text */}
+    {/* <span
+      className={`text-2xl font-bold ${
+        atTop ? "text-primary-500" : "text-yellow-200"
+      } text-center leading-tight`}
+    >
+      <span className="block">Afrika</span>
+      <span className="block">Journals</span>
+    </span> */}
           </a>
           {/* Collapse Button */}
           <div className="md:hidden flex items-center space-x-4">

@@ -421,7 +421,7 @@ function ArticlesPage() {
   return (
     <div className="min-h-screen">
       <Navbar2 />
-      <div className="container mx-auto mt-28 px-4 py-8">
+      <div className="container mx-auto mt-[140px] px-4 py-8">
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-green-800 mb-2">
             African Articles Repository

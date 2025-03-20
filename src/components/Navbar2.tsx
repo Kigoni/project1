@@ -102,16 +102,9 @@ function Navbar2() {
             <img
               src="/logo.png"
               alt="Logo"
-              className="h-32 w-36 object-contain"
+              className="h-20 w-24 object-contain"
             />
-          <span
-  className={`flex flex-col text-2xl font-bold text-primary-500 ${
-    atTop ? "text-primary-500" : "text-yellow-200"
-  } text-center leading-tight`}
->
-  <span>Afrika</span>
-  <span>Journals</span>
-</span>
+        {/* className="h-32 w-36 object-contain" */}
 
 
 

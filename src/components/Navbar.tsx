@@ -103,7 +103,7 @@ function Navbar() {
     <img
       src="/logo.png"
       alt="Logo"
-      className="h-20 w-24 object-contain opacity-75 hover:opacity-90 transition-opacity"
+      className="h-32 w-36 object-contain opacity-75 hover:opacity-90 transition-opacity"
     />
 
     {/* Afrika Journals Text */}

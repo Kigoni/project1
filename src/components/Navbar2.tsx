@@ -169,7 +169,7 @@ function Navbar2() {
                 "Journals",
                 "Articles",
                 "Conferences",
-                "Blog & Funding",
+                "News & Funding",
                 "Testimonials",
                 "FAQ",
               ].map((item) => (
@@ -249,7 +249,7 @@ function Navbar2() {
               "Journals",
               "Articles",
               "Conferences",
-              "Blog & Funding",
+              "News & Funding",
               "Testimonials",
               "FAQ",
             ].map((item) => (

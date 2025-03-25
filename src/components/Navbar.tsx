@@ -172,9 +172,9 @@ function Navbar() {
             <div className="space-x-8 md:py-0 flex flex-col md:flex-row md:items-center md:justify-end gap-0.5 md:gap-1 font-semibold">
               {[
                 "Journals",
-                "Articles",
+                "Submit Articles",
                 "Conferences",
-                "Blog & Funding",
+                "News & Funding",
                 "Testimonials",
                 "FAQ",
               ].map((item) => (
@@ -227,9 +227,9 @@ function Navbar() {
           <ul className="flex lg:items-center max-lg:gap-4 max-lg:mb-4  flex-col mt-4 lg:flex-1 md:mt-0 lg:flex-row ">
             {[
               "Journals",
-              "Articles",
+              "Submit Articles",
               "Conferences",
-              "Blog & Funding",
+              "News & Funding",
               "Testimonials",
               "FAQ",
             ].map((item) => (

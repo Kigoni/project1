@@ -4,7 +4,7 @@ import { Sparkles, ArrowRight } from "lucide-react";
 
 const Hero: React.FC = () => {
   return (
-    <section className="relative h-[97.2vh] min-h-[97.2vh] overflow-hidden">
+    <section className="relative h-[97.2vh] min-h-[97.2vh] overflow-hidden pt-10">
       {/* Background Video */}
       <div className="absolute inset-0 overflow-hidden">
         <video
@@ -20,7 +20,7 @@ const Hero: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 to-green-700/90" />
       </div>
 
-      <div className="relative h-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 flex items-center -mt-16">
+      <div className="relative h-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 flex items-center ">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -58,9 +58,9 @@ const Hero: React.FC = () => {
               </span>{" "}
               and scholarly excellence. We are committed to{" "}
               <span className="text-yellow-400 font-semibold">
-                elevating African academia
+                elevating African academia{" "}
               </span>
-              by showcasing groundbreaking research and fostering global
+               by showcasing groundbreaking research and fostering global
               visibility for African journals.
             </p>
           </div>

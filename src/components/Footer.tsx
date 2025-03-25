@@ -8,7 +8,7 @@ const Footer = () => {
     pages: [
       { name: "Home", href: "#" },
       { name: "About", href: "#about" },
-      { name: "Features", href: "#features" },
+      // { name: "Features", href: "#features" },
       { name: "FAQ", href: "#faq" },
     ],
     utility: [

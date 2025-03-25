@@ -215,50 +215,7 @@ function ArticlesPage() {
     "Afrikaans",
   ];
 
-  // const fetchArticles = useCallback(async () => {
-  //   try {
-  //     setLoading(true);
-  //     const queryParams = new URLSearchParams();
-  //     if (searchQuery) queryParams.append("q", searchQuery);
-  //     queryParams.append("searchBy", searchMode);
-  //     queryParams.append("page", page.toString());
-  //     queryParams.append("page_size", pageSize.toString());
-
-  //     Object.entries(filters).forEach(([key, value]) => {
-  //       if (value) queryParams.append(key, "true");
-  //     });
-  //     const response = await axios.get<ApiResponse>(
-  //       `https://backend.afrikajournals.org/journal_api/articles/search?${queryParams.toString()}`
-  //     );
-  //     const data = response.data;
-
-  //     // Map the API response to the Article type
-  //     const mappedArticles = data.results.map((article: Article) => ({
-  //       id: article.id,
-  //       title: article.title,
-  //       abstract: article.abstract,
-  //       authors: article.authors,
-  //       keywords: article.keywords || "",
-  //       doi: article.doi,
-  //       citations: article.citations,
-  //       peer_reviewed: true, // Assuming all articles are peer-reviewed
-  //       publication_date: article.publication_date,
-  //       language: "English", // Assuming all articles are in English
-  //       country: "Kenya", // Assuming all articles are from Kenya
-  //       thematic_area: "", // Assuming no thematic area is provided
-  //     }));
-  //     console.log(mappedArticles);
-
-  //     setArticles(mappedArticles);
-  //     setFilteredArticles(mappedArticles);
-  //     setData(response.data);
-  //     setLoading(false);
-  //   } catch (err) {
-  //     setError("Failed to fetch articles. Please try again later.");
-  //     setLoading(false);
-  //     console.error("Error fetching articles:", err);
-  //   }
-  // }, [filters, searchQuery, searchMode, page, pageSize]);
+ 
 
   const fetchArticles = useCallback(async () => {
     try {
@@ -321,7 +278,7 @@ function ArticlesPage() {
   }, [
     filters,
     searchQuery,
-    searchMode,
+    // searchMode,
     page,
     pageSize,
     selectedCountries,
@@ -329,10 +286,7 @@ function ArticlesPage() {
     selectedLanguages,
   ]);
 
-  // Fetch articles
-  // useEffect(() => {
-  //   fetchArticles();
-  // }, [filters, searchQuery, searchMode, page, pageSize, fetchArticles]);
+
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {

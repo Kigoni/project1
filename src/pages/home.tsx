@@ -79,12 +79,21 @@ function Home() {
 
         <main>
           <Hero />
-          <Stats />
+           {/* Worldmap and Stats Section */}
+  <div className="flex flex-col lg:flex-row items-center justify-between px-6 lg:px-12 gap-4">
+    <div className="w-full lg:w-2/3">
+      <Worldmap />
+    </div>
+    <div className="w-full lg:w-1/3">
+      <Stats />
+    </div>
+  </div>
+          {/* <Stats /> */}
           <About />
           <JournalSection />
           <ConferenceSection />
           <ReportsSection />
-          <Worldmap />
+          {/* <Worldmap /> */}
           <Testimonials />
           <FAQ />
         </main>

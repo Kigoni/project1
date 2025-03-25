@@ -626,7 +626,7 @@ const featuredItems: FeaturedItem[] = [
     tags: ["Research", "Methods", "Academic"],
     image:
       "https://images.unsplash.com/photo-1532619187608-e5375cab36aa?auto=format&fit=crop&q=80&w=800",
-    link: "#",
+    link: "https://www.researchgate.net/publication/373809840_Research_Methodology_Methods_Approaches_And_Techniques",
     color: "bg-purple-100",
     icon: "📚",
     citations: 150,
@@ -965,7 +965,7 @@ function ReportsSection() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-primary-600">
-              Research Resources Hub
+            Browse Resource Hub 
             </h1>
             <p className="text-lg md:text-xl text-slate-600 mb-12 leading-relaxed">
               Discover AI-powered recommendations and trending research
@@ -1057,7 +1057,7 @@ function ReportsSection() {
 
       {/* Resource Items */}
       <div
-        id="blog&funding"
+        id="news&funding"
         className="container mx-auto px-4 sm:px-6 lg:px-8 py-16"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

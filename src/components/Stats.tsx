@@ -44,8 +44,8 @@ const Stats: React.FC = () => {
 
   return (
     <section className="py-16 bg-white">
-      <div className="container mx-auto px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {statisticsData.map(({ id, icon, value, label }) => (
+<div className="container mx-auto px-4 flex flex-wrap justify-center gap-6">
+{statisticsData.map(({ id, icon, value, label }) => (
           <div
             key={id}
             data-id={id.toString()}

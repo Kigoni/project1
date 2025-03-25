@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Menu } from "@headlessui/react";
 import { Search, Globe, X, MenuIcon } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-function Navbar() {
-  const [language, setLanguage] = useState<string>("EN");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+const Navbar = () => {
+  const [language, setLanguage] = useState("EN");
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Element[]>([]);
-  const [showSearch, setShowSearch] = useState<boolean>(false);
-  const [atTop, setAtTop] = useState<boolean>(true);
-  const [isVisible, setIsVisible] = useState<boolean>(true);
-  const [prevScrollPos, setPrevScrollPos] = useState<number>(0);
+  const [showSearch, setShowSearch] = useState(false);
+  const [atTop, setAtTop] = useState(true);
+  const [isVisible, setIsVisible] = useState(true);
+  const [prevScrollPos, setPrevScrollPos] = useState(0);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   interface Language {
     code: string;
@@ -26,15 +30,15 @@ function Navbar() {
     { code: "es", label: "Spanish" },
   ];
 
-  const changeLanguage = (code: string, label: string): void => {
+  const changeLanguage = (label: string) => {
     setLanguage(label);
   };
 
-  const handleSearchClick = (): void => {
+  const handleSearchClick = () => {
     setShowSearch(true);
   };
 
-  const handleCloseSearch = (): void => {
+  const handleCloseSearch = () => {
     setShowSearch(false);
     setSearchQuery("");
     setSearchResults([]);
@@ -68,7 +72,7 @@ function Navbar() {
 
     if (currentScrollPos === 0) {
       setIsVisible(true);
-      setAtTop(true); // New state to track when at the top
+      setAtTop(true);
     } else if (currentScrollPos > prevScrollPos) {
       setIsVisible(false);
       setAtTop(false);
@@ -85,49 +89,48 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
+  const handleNavigation = (sectionId: string) => {
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <>
       <nav
         id="navbarTop"
         className={`backdrop-blur-sm fixed top-0 z-50 transition-all duration-300 w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16 xl:px-56 py-4 ${
           isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${atTop ? "" : "bg-primary-600"}`} // Remove bg-primary-600 when at the top
+        } ${atTop ? "" : "bg-primary-600"}`}
       >
         <div className="flex items-center justify-between">
-  <a
-    className="flex items-center gap-x-4 font-semibold text-xl focus:outline-none focus:opacity-80"
-    href="/"
-    aria-label="Prominent Australia"
-  >
-    {/* Logo */}
-    <img
-      src="/logo.png"
-      alt="Logo"
-      className="h-32 w-36 object-contain opacity-75 hover:opacity-90 transition-opacity"
-    />
-
-    {/* Afrika Journals Text */}
-    {/* <span
-      className={`text-2xl font-bold ${
-        atTop ? "text-primary-500" : "text-yellow-200"
-      } text-center leading-tight`}
-    >
-      <span className="block">Afrika</span>
-      <span className="block">Journals</span>
-    </span> */}
-          </a>
-          {/* Collapse Button */}
+          <Link
+            className="flex items-center gap-x-4 font-semibold text-xl focus:outline-none focus:opacity-80"
+            to="/"
+            aria-label="Prominent Australia"
+          >
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="h-32 w-36 object-contain opacity-75 hover:opacity-90 transition-opacity"
+            />
+          </Link>
           <div className="md:hidden flex items-center space-x-4">
             <Menu as="div" className="flex items-center">
               <Menu.Button className="p-2 rounded-full bg-green-500 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
                 <Globe className="h-5 w-5" strokeWidth={2.5} />
               </Menu.Button>
               <Menu.Items className="mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
-                {languages.map((lang: Language) => (
+                {languages.map((lang) => (
                   <Menu.Item key={lang.code}>
                     {({ active }) => (
                       <button
-                        onClick={() => changeLanguage(lang.code, lang.label)}
+                        onClick={() => changeLanguage(lang.label)}
                         className={`${
                           active
                             ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
@@ -143,7 +146,7 @@ function Navbar() {
             </Menu>
             <button
               type="button"
-              className="hs-collapse-toggle relative size-9 flex justify-center items-center text-sm font-semibold rounded-lg border border-yellow-200 text-yellow-200 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
+              className="relative size-9 flex justify-center items-center text-sm font-semibold rounded-lg border border-yellow-200 text-yellow-200 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
               id="hs-header-classic-collapse"
               aria-expanded="false"
               aria-controls="hs-header-classic"
@@ -160,10 +163,7 @@ function Navbar() {
               <span className="sr-only">Toggle navigation</span>
             </button>
           </div>
-          {/* End Collapse Button */}
         </div>
-        {/* End Logo w/ Collapse Button */}
-        {/* Collapse */}
         <div
           className="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow md:block"
           aria-labelledby="hs-header-classic-collapse"
@@ -178,25 +178,25 @@ function Navbar() {
                 "Testimonials",
                 "FAQ",
               ].map((item) => (
-                <a
+                <button
                   key={item}
-                  href={`#${item.toLowerCase().replace(/\s+/g, "").trim()}`}
-                  className="text-yellow-200 font-semibold hover:text-[#4ADE80]  transition-colors duration-200 relative group"
+                  onClick={() => handleNavigation(item.toLowerCase().replace(/\s+/g, "").trim())}
+                  className="text-yellow-200 font-semibold hover:text-[#4ADE80] transition-colors duration-200 relative group"
                 >
                   {item}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#34D399] transition-all duration-200 group-hover:w-full" />
-                </a>
+                </button>
               ))}
               <Menu as="div" className="relative">
                 <Menu.Button className="p-2 rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
                   <Globe className="h-5 w-5" strokeWidth={2.5} />
                 </Menu.Button>
                 <Menu.Items className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
-                  {languages.map((lang: Language) => (
+                  {languages.map((lang) => (
                     <Menu.Item key={lang.code}>
                       {({ active }) => (
                         <button
-                          onClick={() => changeLanguage(lang.code, lang.label)}
+                          onClick={() => changeLanguage(lang.label)}
                           className={`${
                             active
                               ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
@@ -210,7 +210,6 @@ function Navbar() {
                   ))}
                 </Menu.Items>
               </Menu>
-
               <button
                 onClick={handleSearchClick}
                 className="p-2 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
@@ -221,10 +220,10 @@ function Navbar() {
           </div>
         </div>
         <div
-          className="hidden w-full justify-between rounded-lg max-lg:bg-black max-lg:mt-1 max-lg:px-4 max-lg:py-4 max-lg:h-auto max-lg:overflow-auto  transition-all duration-500 delay-200"
+          className="hidden w-full justify-between rounded-lg max-lg:bg-black max-lg:mt-1 max-lg:px-4 max-lg:py-4 max-lg:h-auto max-lg:overflow-auto transition-all duration-500 delay-200"
           id="navbar"
         >
-          <ul className="flex lg:items-center max-lg:gap-4 max-lg:mb-4  flex-col mt-4 lg:flex-1 md:mt-0 lg:flex-row ">
+          <ul className="flex lg:items-center max-lg:gap-4 max-lg:mb-4 flex-col mt-4 lg:flex-1 md:mt-0 lg:flex-row">
             {[
               "Journals",
               "Submit Articles",
@@ -234,13 +233,13 @@ function Navbar() {
               "FAQ",
             ].map((item) => (
               <li key={item}>
-                <a
-                  href={`#${item.toLowerCase().replace(/\s+/g, "").trim()}`}
+                <button
+                  onClick={() => handleNavigation(item.toLowerCase().replace(/\s+/g, "").trim())}
                   className="text-yellow-600 text-lg font-normal hover:text-[#4ADE80] transition-all duration-500 mb-2 block lg:mr-6 lg:text-base"
                 >
                   {item}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#34D399] transition-all duration-200 group-hover:w-full" />{" "}
-                </a>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#34D399] transition-all duration-200 group-hover:w-full" />
+                </button>
               </li>
             ))}
           </ul>
@@ -282,27 +281,8 @@ function Navbar() {
           </div>
         )}
       </nav>
-      {/* <button
-        onClick={scrollToTop}
-        className="fixed bottom-4 right-4 p-3 bg-primary-600 text-white rounded-full shadow-md hover:bg-primary-700 transition-all duration-200"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M5 10l7-7m0 0l7 7m-7-7v18"
-          />
-        </svg>
-      </button> */}
     </>
   );
-}
+};
 
 export default Navbar;

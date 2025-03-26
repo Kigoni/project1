@@ -125,14 +125,18 @@ function ArticlesPage() {
       queryParams.append("page", page.toString());
       queryParams.append("page_size", pageSize.toString());
 
-      // Append selected filters
-      selectedCountries.forEach(country => queryParams.append("country", country));
-      selectedThematicAreas.forEach(area => queryParams.append("thematic_area", area));
-      selectedLanguages.forEach(language => queryParams.append("language", language));
-
       Object.entries(filters).forEach(([key, value]) => {
         if (value) queryParams.append(key, "true");
       });
+
+      let combinedQuery = searchQuery;
+      const allFilters = [...selectedLanguages, ...selectedCountries, ...selectedThematicAreas];
+      if (allFilters.length > 0) {
+        const filtersString = allFilters.join(" ");
+        combinedQuery = combinedQuery ? `${combinedQuery} ${filtersString}` : filtersString;
+      }
+      const encodedQuery = encodeURIComponent(combinedQuery.trim());
+      if (encodedQuery) queryParams.append("query", encodedQuery);
 
       const response = await axios.get<ApiResponse>(
         `https://backend.afrikajournals.org/journal_api/api/article/?${queryParams.toString()}`
@@ -144,7 +148,7 @@ function ArticlesPage() {
         keywords: article.keywords || "",
         peer_reviewed: true,
         language: article.language || "English",
-        country: article.country || "Unknown", // Use the country from the API response
+        country: article.country || "Unknown",
         thematic_area: article.thematic_area || "",
       }));
 
@@ -155,26 +159,13 @@ function ArticlesPage() {
     } catch (err) {
       setError("Failed to fetch articles. Please try again later.");
       setLoading(false);
+      console.error("Error fetching articles:", err);
     }
   }, [filters, searchQuery, searchMode, page, pageSize, selectedCountries, selectedThematicAreas, selectedLanguages]);
 
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchArticles();
-    }, 1500); // 1.5 seconds delay
-
-    return () => clearTimeout(delayDebounce);
-  }, [
-    searchQuery,
-    selectedCountries,
-    selectedThematicAreas,
-    selectedLanguages,
-    filters,
-    page,
-    pageSize,
-    searchMode,
-    fetchArticles,
-  ]);
+    fetchArticles();
+  }, [fetchArticles]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

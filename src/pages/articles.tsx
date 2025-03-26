@@ -53,10 +53,6 @@ interface ApiResponse {
   results: Article[];
 }
 
-interface FilterOption {
-  name: string;
-}
-
 function ArticlesPage() {
   // States
   const [data, setData] = useState<ApiResponse | null>(null);
@@ -94,45 +90,66 @@ function ArticlesPage() {
   const [submittedArticles, setSubmittedArticles] = useState<Article[]>([]);
   const [expandedArticleId, setExpandedArticleId] = useState<number | null>(null);
   const [articlesPerPage] = useState(15);
-  const [countries, setCountries] = useState<FilterOption[]>([]);
-  const [thematicAreas, setThematicAreas] = useState<FilterOption[]>([]);
-  const [languages, setLanguages] = useState<FilterOption[]>([]);
+
+  // Mock data for filters
+  const africanCountries = [
+    "Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cabo Verde",
+    "Cameroon", "Central African Republic", "Chad", "Comoros", "Congo", "Côte d'Ivoire",
+    "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon",
+    "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya",
+    "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique",
+    "Namibia", "Niger", "Nigeria", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles",
+    "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo",
+    "Tunisia", "Uganda", "Zambia", "Zimbabwe"
+  ];
+
+  const thematicAreas = [
+    "Agriculture", "Anthropology", "Archaeology", "Architecture", "Art", "Biology",
+    "Business", "Chemistry", "Communication", "Computer Science", "Economics", "Education",
+    "Engineering", "Environmental Science", "Geography", "Geology", "Health Sciences",
+    "History", "Law", "Linguistics", "Literature", "Mathematics", "Medicine", "Music",
+    "Philosophy", "Physics", "Political Science", "Psychology", "Religion", "Sociology"
+  ];
+
+  const languages = [
+    "English", "French", "Portuguese", "Swahili", "Arabic", "Amharic", "Zulu", "Yoruba",
+    "Hausa", "Igbo", "Afrikaans"
+  ];
 
   const fetchArticles = useCallback(async () => {
     try {
-      setShowFilterModal(false);
       setLoading(true);
-
-      // Combine search query with filters
-      let combinedQuery = searchQuery;
-
-      const allFilters = [...selectedLanguages, ...selectedCountries, ...selectedThematicAreas];
-
-      if (allFilters.length > 0) {
-        const filtersString = allFilters.join(" ");
-        combinedQuery = combinedQuery ? `${combinedQuery} ${filtersString}` : filtersString;
-      }
-
-      const encodedQuery = combinedQuery.trim();
-
       const queryParams = new URLSearchParams();
-      if (combinedQuery) queryParams.append("query", encodedQuery);
+      if (searchQuery) queryParams.append("q", searchQuery);
+      queryParams.append("searchBy", searchMode);
       queryParams.append("page", page.toString());
       queryParams.append("page_size", pageSize.toString());
 
-      // Append checkbox filters as query params
+      // Append selected filters
+      selectedCountries.forEach(country => queryParams.append("country", country));
+      selectedThematicAreas.forEach(area => queryParams.append("thematic_area", area));
+      selectedLanguages.forEach(language => queryParams.append("language", language));
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value) queryParams.append(key, "true");
       });
 
       const response = await axios.get<ApiResponse>(
-        `https://backend.afrikajournals.org/journal_api/articles/search?${queryParams.toString()}`
+        `https://backend.afrikajournals.org/journal_api/api/article/?${queryParams.toString()}`
       );
-
       const data = response.data;
 
-      setArticles(data.results);
-      setFilteredArticles(data.results);
+      const mappedArticles = data.results.map((article: Article) => ({
+        ...article,
+        keywords: article.keywords || "",
+        peer_reviewed: true,
+        language: article.language || "English",
+        country: article.country || "Unknown", // Use the country from the API response
+        thematic_area: article.thematic_area || "",
+      }));
+
+      setArticles(mappedArticles);
+      setFilteredArticles(mappedArticles);
       setData(data);
       setLoading(false);
     } catch (err) {
@@ -140,7 +157,7 @@ function ArticlesPage() {
       setLoading(false);
       console.error("Error fetching articles:", err);
     }
-  }, [filters, searchQuery, page, pageSize, selectedCountries, selectedThematicAreas, selectedLanguages]);
+  }, [filters, searchQuery, searchMode, page, pageSize, selectedCountries, selectedThematicAreas, selectedLanguages]);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -148,66 +165,44 @@ function ArticlesPage() {
     }, 1500); // 1.5 seconds delay
 
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, selectedCountries, selectedThematicAreas, selectedLanguages, filters, page, pageSize, searchMode, fetchArticles]);
+  }, [
+    searchQuery,
+    selectedCountries,
+    selectedThematicAreas,
+    selectedLanguages,
+    filters,
+    page,
+    pageSize,
+    searchMode,
+    fetchArticles,
+  ]);
 
-  // Fetch filter options from API
-  useEffect(() => {
-    const fetchFilterOptions = async () => {
-      try {
-        const [countriesResponse, thematicAreasResponse, languagesResponse] = await Promise.all([
-          axios.get<FilterOption[]>("https://backend.afrikajournals.org/journal_api/countries"),
-          axios.get<FilterOption[]>("https://backend.afrikajournals.org/journal_api/thematic-areas"),
-          axios.get<FilterOption[]>("https://backend.afrikajournals.org/journal_api/languages"),
-        ]);
-
-        setCountries(countriesResponse.data);
-        setThematicAreas(thematicAreasResponse.data);
-        setLanguages(languagesResponse.data);
-      } catch (err) {
-        console.error("Error fetching filter options:", err);
-      }
-    };
-
-    fetchFilterOptions();
-  }, []);
-
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newArticle.title && newArticle.abstract) {
-      const formData = new FormData();
-      formData.append("title", newArticle.title);
-      formData.append("abstract", newArticle.abstract);
-      formData.append("authors", newArticle.authors);
-      formData.append("keywords", newArticle.keywords);
-      if (newArticle.file) {
-        formData.append("file", newArticle.file);
-      }
-
-      try {
-        const response = await axios.post("https://backend.afrikajournals.org/journal_api/api/article/", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        const submittedArticle = response.data;
-        setSubmittedArticles([...submittedArticles, submittedArticle]);
-        setNewArticle({
-          title: "",
-          abstract: "",
-          authors: "",
-          keywords: "",
-          file: null,
-        });
-      } catch (err) {
-        console.error("Error submitting article:", err);
-        setError("Failed to submit article. Please try again later.");
-      }
+      const submittedArticle = {
+        ...newArticle,
+        id: submittedArticles.length + 1,
+        date: new Date().toISOString().split("T")[0],
+        doi: "",
+        citations: 0,
+        peer_reviewed: true,
+        publication_date: "",
+        language: "",
+        country: "",
+        thematic_area: "",
+      };
+      setSubmittedArticles([...submittedArticles, submittedArticle]);
+      setNewArticle({
+        title: "",
+        abstract: "",
+        authors: "",
+        keywords: "",
+        file: null,
+      });
     }
   };
 
-  // Handle file change
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setNewArticle({
@@ -217,7 +212,6 @@ function ArticlesPage() {
     }
   };
 
-  // Toggle article expansion
   const toggleArticleExpansion = (id: number) => {
     setExpandedArticleId(expandedArticleId === id ? null : id);
   };
@@ -238,10 +232,9 @@ function ArticlesPage() {
       open_access_journal: false,
     });
     setPage(1);
-    fetchArticles(); // Re-fetch with cleared filters
+    fetchArticles();
   };
 
-  // Pagination logic
   const currentArticles = filteredArticles;
   const totalPages = data?.count ? Math.ceil(data.count / pageSize) : 1;
 
@@ -258,7 +251,6 @@ function ArticlesPage() {
           </p>
         </header>
 
-        {/* Search and Filter Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
             <div className="flex space-x-4">
@@ -318,7 +310,6 @@ function ArticlesPage() {
             </div>
           </div>
 
-          {/* Active Filters Display */}
           {(selectedCountries.length > 0 ||
             selectedThematicAreas.length > 0 ||
             selectedLanguages.length > 0) && (
@@ -381,7 +372,6 @@ function ArticlesPage() {
           )}
         </div>
 
-        {/* Filter Modal */}
         {showFilterModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -398,7 +388,6 @@ function ArticlesPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Countries Filter */}
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <Globe className="h-5 w-5 mr-2 text-blue-600" />
@@ -414,44 +403,43 @@ function ArticlesPage() {
                     />
                   </div>
                   <div className="max-h-60 overflow-y-auto">
-                    {countries
+                    {africanCountries
                       .filter((country) =>
-                        country.name
+                        country
                           .toLowerCase()
                           .includes(countrySearch.toLowerCase())
                       )
                       .map((country) => (
-                        <div key={country.name} className="flex items-center mb-2">
+                        <div key={country} className="flex items-center mb-2">
                           <input
                             type="checkbox"
-                            id={`country-${country.name}`}
-                            checked={selectedCountries.includes(country.name)}
+                            id={`country-${country}`}
+                            checked={selectedCountries.includes(country)}
                             onChange={() => {
-                              if (selectedCountries.includes(country.name)) {
+                              if (selectedCountries.includes(country)) {
                                 setSelectedCountries(
-                                  selectedCountries.filter((c) => c !== country.name)
+                                  selectedCountries.filter((c) => c !== country)
                                 );
                               } else {
                                 setSelectedCountries([
                                   ...selectedCountries,
-                                  country.name,
+                                  country,
                                 ]);
                               }
                             }}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
                           <label
-                            htmlFor={`country-${country.name}`}
+                            htmlFor={`country-${country}`}
                             className="ml-2 text-sm text-gray-700"
                           >
-                            {country.name}
+                            {country}
                           </label>
                         </div>
                       ))}
                   </div>
                 </div>
 
-                {/* Thematic Areas Filter */}
                 <div className="bg-green-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <FileText className="h-5 w-5 mr-2 text-green-600" />
@@ -459,37 +447,36 @@ function ArticlesPage() {
                   </h3>
                   <div className="max-h-60 overflow-y-auto">
                     {thematicAreas.map((area) => (
-                      <div key={area.name} className="flex items-center mb-2">
+                      <div key={area} className="flex items-center mb-2">
                         <input
                           type="checkbox"
-                          id={`area-${area.name}`}
-                          checked={selectedThematicAreas.includes(area.name)}
+                          id={`area-${area}`}
+                          checked={selectedThematicAreas.includes(area)}
                           onChange={() => {
-                            if (selectedThematicAreas.includes(area.name)) {
+                            if (selectedThematicAreas.includes(area)) {
                               setSelectedThematicAreas(
-                                selectedThematicAreas.filter((a) => a !== area.name)
+                                selectedThematicAreas.filter((a) => a !== area)
                               );
                             } else {
                               setSelectedThematicAreas([
                                 ...selectedThematicAreas,
-                                area.name,
+                                area,
                               ]);
                             }
                           }}
                           className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                         />
                         <label
-                          htmlFor={`area-${area.name}`}
+                          htmlFor={`area-${area}`}
                           className="ml-2 text-sm text-gray-700"
                         >
-                          {area.name}
+                          {area}
                         </label>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Languages Filter */}
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <Languages className="h-5 w-5 mr-2 text-purple-600" />
@@ -497,30 +484,30 @@ function ArticlesPage() {
                   </h3>
                   <div className="max-h-60 overflow-y-auto">
                     {languages.map((language) => (
-                      <div key={language.name} className="flex items-center mb-2">
+                      <div key={language} className="flex items-center mb-2">
                         <input
                           type="checkbox"
-                          id={`language-${language.name}`}
-                          checked={selectedLanguages.includes(language.name)}
+                          id={`language-${language}`}
+                          checked={selectedLanguages.includes(language)}
                           onChange={() => {
-                            if (selectedLanguages.includes(language.name)) {
+                            if (selectedLanguages.includes(language)) {
                               setSelectedLanguages(
-                                selectedLanguages.filter((l) => l !== language.name)
+                                selectedLanguages.filter((l) => l !== language)
                               );
                             } else {
                               setSelectedLanguages([
                                 ...selectedLanguages,
-                                language.name,
+                                language,
                               ]);
                             }
                           }}
                           className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
                         <label
-                          htmlFor={`language-${language.name}`}
+                          htmlFor={`language-${language}`}
                           className="ml-2 text-sm text-gray-700"
                         >
-                          {language.name}
+                          {language}
                         </label>
                       </div>
                     ))}
@@ -551,7 +538,6 @@ function ArticlesPage() {
           </div>
         )}
 
-        {/* Articles Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">
@@ -568,7 +554,6 @@ function ArticlesPage() {
             </button>
           </div>
 
-          {/* Article Submission Form */}
           {showSubmissionForm && (
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
               <h3 className="text-xl font-bold text-gray-800 mb-4">
@@ -663,7 +648,6 @@ function ArticlesPage() {
             </div>
           )}
 
-          {/* Submitted Articles */}
           {submittedArticles.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
               <h3 className="text-xl font-bold text-gray-800 mb-4">
@@ -697,14 +681,12 @@ function ArticlesPage() {
             </div>
           )}
 
-          {/* Error Message */}
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
               {error}
             </div>
           )}
 
-          {/* Articles List */}
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -792,7 +774,6 @@ function ArticlesPage() {
                     </div>
                   </div>
 
-                  {/* Expanded Article View */}
                   {expandedArticleId === article.id && (
                     <div className="border-t border-gray-200 p-6 bg-gray-50">
                       <div className="mb-4">
@@ -802,7 +783,6 @@ function ArticlesPage() {
                         <p className="text-gray-700">{article.abstract}</p>
                       </div>
 
-                      {/* Interactive Features */}
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <button className="flex items-center justify-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-yellow-200 transition-colors">
                           <Bookmark className="h-5 w-5 mr-2 text-blue-600" />
@@ -897,7 +877,6 @@ function ArticlesPage() {
             </div>
           )}
 
-          {/* Pagination Controls */}
           <div className="flex items-center justify-between mt-8">
             <button
               disabled={page === 1}
@@ -928,7 +907,6 @@ function ArticlesPage() {
             </button>
           </div>
 
-          {/* Page Size Selector */}
           <div className="mt-4 text-center">
             <label htmlFor="pageSize" className="text-gray-700 mr-2">
               Results per page:

@@ -135,7 +135,7 @@ function ArticlesPage() {
         const filtersString = allFilters.join(" ");
         combinedQuery = combinedQuery ? `${combinedQuery} ${filtersString}` : filtersString;
       }
-      const encodedQuery = encodeURIComponent(combinedQuery.trim());
+      const encodedQuery = combinedQuery.trim();
       if (encodedQuery) queryParams.append("query", encodedQuery);
 
       const response = await axios.get<ApiResponse>(
@@ -148,7 +148,7 @@ function ArticlesPage() {
         keywords: article.keywords || "",
         peer_reviewed: true,
         language: article.language || "English",
-        country: article.country || "Unknown",
+        country: article.country || "Unknown", // Use the country from the API response
         thematic_area: article.thematic_area || "",
       }));
 
@@ -164,8 +164,22 @@ function ArticlesPage() {
   }, [filters, searchQuery, searchMode, page, pageSize, selectedCountries, selectedThematicAreas, selectedLanguages]);
 
   useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+    const delayDebounce = setTimeout(() => {
+      fetchArticles();
+    }, 1500); // 1.5 seconds delay
+
+    return () => clearTimeout(delayDebounce);
+  }, [
+    searchQuery,
+    selectedCountries,
+    selectedThematicAreas,
+    selectedLanguages,
+    filters,
+    page,
+    pageSize,
+    searchMode,
+    fetchArticles,
+  ]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -155,7 +155,6 @@ function ArticlesPage() {
     } catch (err) {
       setError("Failed to fetch articles. Please try again later.");
       setLoading(false);
-      console.error("Error fetching articles:", err);
     }
   }, [filters, searchQuery, searchMode, page, pageSize, selectedCountries, selectedThematicAreas, selectedLanguages]);
 

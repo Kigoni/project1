@@ -70,7 +70,6 @@ const ChatBot: React.FC<ChatBotProps> = ({
 
     axiosChat<ChatCompletion>({ method: "POST", url: URL, data: data })
       .then((response) => {
-        console.log(response);
         setChatLog((prevChatLog) => [
           ...prevChatLog,
           { type: "bot", message: response.choices[0].message.content },
@@ -79,7 +78,6 @@ const ChatBot: React.FC<ChatBotProps> = ({
       })
       .catch((error) => {
         setIsLoading(false);
-        console.log(error);
       });
   };
 

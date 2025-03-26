@@ -40,7 +40,7 @@
 
 //         setData(processedData);
 //       })
-//       .catch(error => console.error("Error fetching data:", error));
+//       .catch(error => ("Error fetching data:", error));
 //   }, []);
 
 //   useEffect(() => {

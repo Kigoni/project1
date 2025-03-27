@@ -104,7 +104,7 @@ const Navbar2 = () => {
     <>
       <nav
         id="navbarTop"
-        className={`backdrop-blur-sm bg-primary-600 fixed top-0 z-50 transition-all duration-300 w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16 xl:px-56 py-4 ${
+        className={`backdrop-blur-sm bg-primary-600 fixed top-0 z-50 transition-all duration-300 w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16 py-4 ${
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
@@ -112,12 +112,12 @@ const Navbar2 = () => {
           <Link
             className="flex-none font-semibold text-xl focus:outline-none focus:opacity-80"
             to="/"
-            aria-label="Prominent Australia"
+            aria-label="logo"
           >
             <img
               src="/logo.png"
               alt="Logo"
-              className="h-20 w-24 object-contain"
+              className="h-8 w-16 object-contain"
             />
           </Link>
           <div className="md:hidden flex items-center space-x-4">

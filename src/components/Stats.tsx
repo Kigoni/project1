@@ -30,7 +30,8 @@ const Stats: React.FC = () => {
         setVisibleItems((prev) => {
           const newSet = new Set(prev);
           entries.forEach((entry) => {
-            if (entry.isIntersecting) newSet.add((entry.target as HTMLElement).dataset.id!);
+            if (entry.isIntersecting)
+              newSet.add((entry.target as HTMLElement).dataset.id!);
           });
           return newSet;
         });
@@ -38,19 +39,39 @@ const Stats: React.FC = () => {
       { threshold: 0.3 }
     );
 
-    document.querySelectorAll(".stats-item").forEach((el) => observer.observe(el));
+    document
+      .querySelectorAll(".stats-item")
+      .forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
   return (
     <section className="py-16 bg-white">
-<div className="container mx-auto px-4 flex flex-wrap justify-center gap-6">
-{statisticsData.map(({ id, icon, value, label }) => (
+      {/* <div className="container mx-auto px-4 flex flex-wrap justify-center gap-6"> */}
+      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 justify-items-center">
+        {/* {statisticsData.map(({ id, icon, value, label }) => (
           <div
             key={id}
             data-id={id.toString()}
             className={`stats-item w-[256px] h-[152px] flex flex-col items-center justify-center backdrop-blur-lg bg-yellow-300/5 border border-white/20 rounded-xl shadow-lg transform transition-all duration-500 ease-in-out ${
-              visibleItems.has(id.toString()) ? "opacity-100 scale-100" : "opacity-0 scale-90"
+              visibleItems.has(id.toString())
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-90"
+            }`}
+          >
+            <div className="text-emerald-500 text-3xl mb-2">{icon}</div>
+            <Counter endValue={value} />
+            <p className="text-gray-600 font-medium text-lg">{label}</p>
+          </div>
+        ))} */}
+        {statisticsData.map(({ id, icon, value, label }) => (
+          <div
+            key={id}
+            data-id={id.toString()}
+            className={`stats-item w-full max-w-[300px] h-[152px] flex flex-col items-center justify-center backdrop-blur-lg bg-yellow-300/5 border border-white/20 rounded-xl shadow-lg transform transition-all duration-500 ease-in-out ${
+              visibleItems.has(id.toString())
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-90"
             }`}
           >
             <div className="text-emerald-500 text-3xl mb-2">{icon}</div>
@@ -98,9 +119,7 @@ const Counter: React.FC<CounterProps> = ({ endValue }) => {
   }, [endValue]);
 
   return (
-    
     <div>
-      
       <h2 ref={ref} className="text-3xl font-bold text-gray-800">
         {count.toLocaleString()}
       </h2>

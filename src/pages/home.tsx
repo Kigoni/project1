@@ -67,7 +67,10 @@ function Home() {
       </div>
 
       {/* Feedback Form */}
-      <FeedbackForm isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
+      <FeedbackForm
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+      />
 
       {/* Scroll to Top Button */}
       <AnimatePresence>

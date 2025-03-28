@@ -1,26 +1,22 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 import { Menu } from "@headlessui/react";
 import { Search, Globe, X, MenuIcon } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const Navbar = () => {
-  const [language, setLanguage] = useState("EN");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Element[]>([]);
-  const [showSearch, setShowSearch] = useState(false);
-  const [atTop, setAtTop] = useState(true);
-  const [isVisible, setIsVisible] = useState(true);
-  const [prevScrollPos, setPrevScrollPos] = useState(0);
+const Navbar: React.FC = () => {
+  const [language, setLanguage] = useState<string>("EN");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearch, setShowSearch] = useState<boolean>(false);
+  const [atTop, setAtTop] = useState<boolean>(true);
+  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [prevScrollPos, setPrevScrollPos] = useState<number>(0);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  interface Language {
-    code: string;
-    label: string;
-  }
-
-  const languages: Language[] = [
+  const languages = [
     { code: "en", label: "English" },
     { code: "zu", label: "Zulu" },
     { code: "pt", label: "Portuguese" },
@@ -30,57 +26,10 @@ const Navbar = () => {
     { code: "es", label: "Spanish" },
   ];
 
-  const changeLanguage = (label: string) => {
-    setLanguage(label);
-  };
-
-  const handleSearchClick = () => {
-    setShowSearch(true);
-  };
-
-  const handleCloseSearch = () => {
-    setShowSearch(false);
-    setSearchQuery("");
-    setSearchResults([]);
-  };
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value;
-    setSearchQuery(query);
-
-    if (!query) {
-      setSearchResults([]);
-      return;
-    }
-
-    const elements = Array.from(
-      document.body.querySelectorAll("p, h1, h2, h3, h4, h5, h6, span, a, div")
-    );
-    const results = elements.filter((element) =>
-      element.textContent?.toLowerCase().includes(query.toLowerCase())
-    );
-    setSearchResults(results);
-  };
-
-  const handleResultClick = (element: Element) => {
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
-    setShowSearch(false);
-  };
-
   const handleScroll = useCallback(() => {
     const currentScrollPos = window.pageYOffset;
-
-    if (currentScrollPos === 0) {
-      setIsVisible(true);
-      setAtTop(true);
-    } else if (currentScrollPos > prevScrollPos) {
-      setIsVisible(false);
-      setAtTop(false);
-    } else {
-      setIsVisible(true);
-      setAtTop(false);
-    }
-
+    setIsVisible(currentScrollPos < prevScrollPos || currentScrollPos === 0);
+    setAtTop(currentScrollPos === 0);
     setPrevScrollPos(currentScrollPos);
   }, [prevScrollPos]);
 
@@ -93,195 +42,97 @@ const Navbar = () => {
     if (location.pathname !== "/") {
       navigate("/");
       setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: "smooth" });
+        }
       }, 100);
     } else {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
   return (
-    <>
-      <nav
-        id="navbarTop"
-        className={`backdrop-blur-sm fixed top-0 z-50 transition-all duration-300 w-full md:flex md:items-center md:justify-between md:gap-3 mx-auto px-4 sm:px-4 lg:px-16  py-4 ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${atTop ? "" : "bg-primary-600"}`}
-      >
-        <div className="flex items-center justify-between">
-          <Link
-            className="flex items-center gap-x-4 font-semibold text-xl focus:outline-none focus:opacity-80"
-            to="/"
-            aria-label="logo"
-          >
-            <img
-              src="/logo.png"
-              alt="Logo"
-              className="h-8 w-24 object-contain opacity-75 hover:opacity-90 transition-opacity"
-            />
-          </Link>
-          <div className="md:hidden flex items-center space-x-4">
-            <Menu as="div" className="flex items-center">
-              <Menu.Button className="p-2 rounded-full bg-green-500 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                <Globe className="h-5 w-5" strokeWidth={2.5} />
-              </Menu.Button>
-              <Menu.Items className="mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
-                {languages.map((lang) => (
-                  <Menu.Item key={lang.code}>
-                    {({ active }) => (
-                      <button
-                        onClick={() => changeLanguage(lang.label)}
-                        className={`${
-                          active
-                            ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
-                            : "text-gray-700"
-                        } flex w-full px-4 py-2 text-sm font-medium transition-colors duration-150`}
-                      >
-                        {lang.label}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
-              </Menu.Items>
-            </Menu>
+    <nav
+      id="navbarTop"
+      className={`backdrop-blur-sm fixed top-0 z-50 transition-all duration-300 w-full px-4 sm:px-6 lg:px-16 xl:px-56 py-4 flex justify-between items-center ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      } ${atTop ? "" : "bg-primary-600"}`}
+    >
+      <Link to="/" className="flex items-center gap-x-4 font-semibold text-xl">
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="h-28 w-32 object-contain opacity-75 hover:opacity-90 transition-opacity"
+        />
+      </Link>
+
+      <div className="hidden md:flex items-center space-x-10">
+        {["Journals", "Submit Articles", "Conferences", "News & Funding", "Testimonials", "FAQ"].map(
+          (item) => (
             <button
-              type="button"
-              className="relative size-9 flex justify-center items-center text-sm font-semibold rounded-lg border border-yellow-200 text-yellow-200 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
-              id="hs-header-classic-collapse"
-              aria-expanded="false"
-              aria-controls="hs-header-classic"
-              aria-label="Toggle navigation"
-              data-hs-collapse="#hs-header-classic"
-              onClick={() => {
-                const navbar = document.getElementById("navbar");
-                if (navbar) {
-                  navbar.classList.toggle("hidden");
-                }
-              }}
+              key={item}
+              onClick={() => handleNavigation(item.toLowerCase().replace(/\s+/g, "").trim())}
+              className="text-yellow-200 font-semibold hover:text-green-400 transition-colors duration-200 relative group"
             >
-              <MenuIcon size={24} />
-              <span className="sr-only">Toggle navigation</span>
+              {item}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-400 transition-all duration-200 group-hover:w-full" />
             </button>
-          </div>
-        </div>
-        <div
-          className="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow md:block"
-          aria-labelledby="hs-header-classic-collapse"
-        >
-          <div className="overflow-hidden overflow-y-auto max-h-[75vh] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-            <div className="space-x-8 md:py-0 flex flex-col md:flex-row md:items-center md:justify-end gap-0.5 md:gap-1 font-semibold">
-              {[
-                "Journals",
-                "Submit Articles",
-                "Conferences",
-                "News & Funding",
-                "Testimonials",
-                "FAQ",
-              ].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => handleNavigation(item.toLowerCase().replace(/\s+/g, "").trim())}
-                  className="text-yellow-200 font-semibold hover:text-[#4ADE80] transition-colors duration-200 relative group"
-                >
-                  {item}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#34D399] transition-all duration-200 group-hover:w-full" />
-                </button>
-              ))}
-              <Menu as="div" className="relative">
-                <Menu.Button className="p-2 rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                  <Globe className="h-5 w-5" strokeWidth={2.5} />
-                </Menu.Button>
-                <Menu.Items className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden">
-                  {languages.map((lang) => (
-                    <Menu.Item key={lang.code}>
-                      {({ active }) => (
-                        <button
-                          onClick={() => changeLanguage(lang.label)}
-                          className={`${
-                            active
-                              ? "bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-600"
-                              : "text-gray-700"
-                          } flex w-full px-4 py-2 text-sm font-medium transition-colors duration-150`}
-                        >
-                          {lang.label}
-                        </button>
-                      )}
-                    </Menu.Item>
-                  ))}
-                </Menu.Items>
-              </Menu>
-              <button
-                onClick={handleSearchClick}
-                className="p-2 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                <Search className="h-4 w-4" strokeWidth={2} />
-              </button>
-            </div>
-          </div>
-        </div>
-        <div
-          className="hidden w-full justify-between rounded-lg max-lg:bg-black max-lg:mt-1 max-lg:px-4 max-lg:py-4 max-lg:h-auto max-lg:overflow-auto transition-all duration-500 delay-200"
-          id="navbar"
-        >
-          <ul className="flex lg:items-center max-lg:gap-4 max-lg:mb-4 flex-col mt-4 lg:flex-1 md:mt-0 lg:flex-row">
-            {[
-              "Journals",
-              "Submit Articles",
-              "Conferences",
-              "News & Funding",
-              "Testimonials",
-              "FAQ",
-            ].map((item) => (
-              <li key={item}>
-                <button
-                  onClick={() => handleNavigation(item.toLowerCase().replace(/\s+/g, "").trim())}
-                  className="text-yellow-600 text-lg font-normal hover:text-[#4ADE80] transition-all duration-500 mb-2 block lg:mr-6 lg:text-base"
-                >
-                  {item}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#34D399] transition-all duration-200 group-hover:w-full" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {showSearch && (
-          <div className="fixed top-20 left-0 w-full bg-white shadow-lg p-4 z-50 rounded-lg max-w-md mx-auto border">
-            <div className="flex justify-between items-center mb-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder="Search the page..."
-                className="w-full p-2 border rounded"
-              />
-              <button
-                onClick={handleCloseSearch}
-                className="ml-2 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <ul className="mt-2 max-h-60 overflow-auto border rounded bg-gray-50">
-              {searchResults.length > 0 ? (
-                searchResults.map((result, index) => (
-                  <li
-                    key={index}
-                    className="cursor-pointer p-2 border-b hover:bg-gray-100 text-sm text-gray-800"
-                    onClick={() => handleResultClick(result)}
-                  >
-                    {result.textContent?.slice(0, 100)}...
-                  </li>
-                ))
-              ) : (
-                <li className="p-2 text-gray-500 text-center">
-                  No results found
-                </li>
-              )}
-            </ul>
-          </div>
+          )
         )}
-      </nav>
-    </>
+
+        <Menu as="div" className="relative ml-6">
+          <Menu.Button className="p-2 rounded-full bg-primary-600 text-white hover:bg-primary-700">
+            <Globe className="h-5 w-5" />
+          </Menu.Button>
+          <Menu.Items className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5">
+            {languages.map((lang) => (
+              <Menu.Item key={lang.code}>
+                {({ active }) => (
+                  <button
+                    onClick={() => setLanguage(lang.label)}
+                    className={`${active ? "bg-gray-200" : "text-gray-700"} block px-4 py-2 text-sm`}
+                  >
+                    {lang.label}
+                  </button>
+                )}
+              </Menu.Item>
+            ))}
+          </Menu.Items>
+        </Menu>
+      </div>
+
+      <div className="flex items-center space-x-6 md:hidden">
+        <Menu as="div" className="relative">
+          <Menu.Button className="p-2 rounded-full bg-primary-600 text-white hover:bg-primary-700">
+            <Globe className="h-5 w-5" />
+          </Menu.Button>
+          <Menu.Items className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5">
+            {languages.map((lang) => (
+              <Menu.Item key={lang.code}>
+                {({ active }) => (
+                  <button
+                    onClick={() => setLanguage(lang.label)}
+                    className={`${active ? "bg-gray-200" : "text-gray-700"} block px-4 py-2 text-sm`}
+                  >
+                    {lang.label}
+                  </button>
+                )}
+              </Menu.Item>
+            ))}
+          </Menu.Items>
+        </Menu>
+        <button
+          onClick={() => document.getElementById("navbar")?.classList.toggle("hidden")}
+          className="p-2 md:hidden"
+        >
+          <MenuIcon size={24} />
+        </button>
+      </div>
+    </nav>
   );
 };
 

@@ -6,11 +6,11 @@ const Journalspage = () => {
         <div>
            <Navbar2 />
            <div ><iframe
-  style={{ border: "1px #FFFFFF none", marginTop: "68px" }}
+  style={{ border: "1px #FFFFFF none" }}
   src="https://afrikajournals.netlify.app/"
   title="iFrame"
   width="100%"
-  height="8600px"
+  height="2600px"
   scrolling="no"
   frameBorder="no"
   allow="fullscreen"

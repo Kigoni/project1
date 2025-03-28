@@ -136,13 +136,14 @@ function ArticlesPage() {
         combinedQuery = combinedQuery ? `${combinedQuery} ${filtersString}` : filtersString;
       }
       const encodedQuery = combinedQuery.trim();
+      console.log(encodedQuery)
       if (encodedQuery) queryParams.append("query", encodedQuery);
 
       const response = await axios.get<ApiResponse>(
-        `https://backend.afrikajournals.org/journal_api/api/article/?${queryParams.toString()}`
+        `https://backend.afrikajournals.org/journal_api/articles/search/?${queryParams.toString()}`
       );
       const data = response.data;
-
+      console.log('data-',data)
       const mappedArticles = data.results.map((article: Article) => ({
         ...article,
         keywords: article.keywords || "",
@@ -181,32 +182,79 @@ function ArticlesPage() {
     fetchArticles,
   ]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newArticle.title && newArticle.abstract) {
-      const submittedArticle = {
-        ...newArticle,
-        id: submittedArticles.length + 1,
-        date: new Date().toISOString().split("T")[0],
-        doi: "",
-        citations: 0,
-        peer_reviewed: true,
-        publication_date: "",
-        language: "",
-        country: "",
-        thematic_area: "",
-      };
-      setSubmittedArticles([...submittedArticles, submittedArticle]);
-      setNewArticle({
-        title: "",
-        abstract: "",
-        authors: "",
-        keywords: "",
-        file: null,
-      });
+  
+    if (!newArticle.title || !newArticle.abstract || !newArticle.authors) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append("title", newArticle.title);
+      formData.append("abstract", newArticle.abstract);
+      formData.append("authors", newArticle.authors);
+      formData.append("keywords", newArticle.keywords || "");
+      if (newArticle.file) {
+        formData.append("file", newArticle.file);
+      }
+      console.log(formData)
+      const token = localStorage.getItem("authToken");
+  
+      if (!token) {
+        // New user registration
+        const registerResponse = await axios.post(
+          "https://backend.afrikajournals.org/api/register/",
+          {
+            username: newArticle.authors,
+            email: `${newArticle.authors.replace(/\s+/g, "").toLowerCase()}@example.com`,
+            password: "defaultPassword123", // Consider allowing the user to set their password
+          }
+        );
+        
+        console.log("register response",registerResponse)
+  
+        if (registerResponse.status === 201) {
+          console.log("User registered successfully:", registerResponse.data);
+          alert("User registered. Please log in and submit again.");
+        } else {
+          throw new Error("Registration failed.");
+        }
+      } else {
+        // Submit article as registered user
+        const response = await axios.post(
+          "https://backend.afrikajournals.org/journal_api/api/article/",
+          formData,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+  
+        if (response.status === 201) {
+          alert("Article submitted successfully!");
+          setNewArticle({
+            title: "",
+            abstract: "",
+            authors: "",
+            keywords: "",
+            file: null,
+          });
+          fetchArticles(); // Refresh the list after submission
+        } else {
+          throw new Error("Article submission failed.");
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting article:", error);
+      alert("An error occurred while submitting the article. Please try again.");
     }
   };
-
+  
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setNewArticle({
@@ -531,12 +579,12 @@ function ArticlesPage() {
                 >
                   Clear All
                 </button>
-                <button
+                {/* <button
                   className="px-4 py-2 bg-yellow-200 text-black rounded-lg hover:bg-yellow-400 transition-colors"
                   onClick={() => fetchArticles()}
                 >
                   Apply Filters
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

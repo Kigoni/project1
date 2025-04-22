@@ -8,6 +8,10 @@ interface TooltipState {
   visible: boolean;
 }
 
+interface WorldmapProps {
+  onCountryClick: (country: string) => void;
+}
+
 const INITIAL_TOOLTIP_STATE: TooltipState = {
   content: "",
   x: 0,
@@ -15,7 +19,7 @@ const INITIAL_TOOLTIP_STATE: TooltipState = {
   visible: false,
 };
 
-const Worldmap: React.FC = () => {
+const Worldmap: React.FC<WorldmapProps> = ({ onCountryClick }) => {
   const [tooltip, setTooltip] = useState<TooltipState>(INITIAL_TOOLTIP_STATE);
 
   const defaultColor = "#4ade80"; // Light Blue (Pale Turquoise)
@@ -77,19 +81,26 @@ const Worldmap: React.FC = () => {
     Zimbabwe: "#FDC72F",
   };
 
+  const handleCountryClick = (countryName: string) => {
+    console.log("Country clicked in Worldmap:", countryName);
+    if (typeof onCountryClick === "function") {
+      onCountryClick(countryName);
+    } else {
+      console.error("onCountryClick is not a function");
+    }
+  };
+
   return (
     <div className="relative min-h-[80vh] flex flex-col items-center overflow-hidden">
       {/* Glowing Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-yellow-500/5 animate-pulse" />
-        {/* <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,140,0,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(255,69,0,0.1),transparent_50%)]" /> */}
       </div>
 
       {/* Header */}
       <header className="mt-10 mb-6 text-center z-10 relative">
         <h1 className="text-4xl font-extrabold">
-          <span className=" text-primary-600 ">African Journal Explorer</span>
+          <span className="text-primary-600">African Journal Explorer</span>
         </h1>
         <p className="text-lg text-amber mt-4">
           Click on any country to explore its Journals details
@@ -109,8 +120,7 @@ const Worldmap: React.FC = () => {
           <Geographies geography="https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/africa.geojson">
             {({ geographies }) =>
               geographies.map((geo) => {
-                const countryName = geo.properties
-                  .name as keyof typeof countryHoverColors;
+                const countryName = geo.properties.name as keyof typeof countryHoverColors;
                 return (
                   <Geography
                     key={geo.rsmKey}
@@ -154,11 +164,7 @@ const Worldmap: React.FC = () => {
                     onMouseLeave={() => {
                       setTooltip((prev) => ({ ...prev, visible: false }));
                     }}
-                    onClick={() => {
-                      window.location.href = `https://afrijour.web.app/?query=${countryName
-                        .replace(/\s+/g, "")
-                        .toLowerCase()}`;
-                    }}
+                    onClick={() => handleCountryClick(countryName)}
                   />
                 );
               })

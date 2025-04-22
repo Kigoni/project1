@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
         <img
           src="/logo.png"
           alt="Logo"
-          className="h-24 w-28 object-contain opacity-75 hover:opacity-90 transition-opacity"
+          className="h-16 w-28 object-contain opacity-75 hover:opacity-90 transition-opacity"
         />
       </Link>
 

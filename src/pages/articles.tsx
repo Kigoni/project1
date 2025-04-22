@@ -29,6 +29,9 @@ import {
 } from "lucide-react";
 import Navbar2 from "../components/Navbar2";
 import Footer from "../components/Footer";
+import { fetchRelatedResearch, fetchResearchDetails } from "@/components/lib/api";
+import MarkdownStyler from "../components/Journals/markdownstyler";
+import ReactMarkdown from "react-markdown";
 
 // Types
 interface Article {
@@ -90,6 +93,8 @@ function ArticlesPage() {
   const [submittedArticles, setSubmittedArticles] = useState<Article[]>([]);
   const [expandedArticleId, setExpandedArticleId] = useState<number | null>(null);
   const [articlesPerPage] = useState(15);
+  const [relatedResearchMarkdown, setRelatedResearchMarkdown] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   // Mock data for filters
   const africanCountries = [
@@ -181,6 +186,18 @@ function ArticlesPage() {
     searchMode,
     fetchArticles,
   ]);
+
+  const handleRelatedResearch = async (title: string, description: string) => {
+    const queryContent = `title:${title} description:${description}`;
+    const response = await fetchRelatedResearch(queryContent);
+    setRelatedResearchMarkdown(response); 
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setRelatedResearchMarkdown(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -916,7 +933,38 @@ function ArticlesPage() {
                           </button>
                         </div>
                         <div>
-                          <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                          {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-3xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Related Research</h2>
+              <button
+                onClick={closeModal}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-96">
+              {relatedResearchMarkdown ? (
+                // <MarkdownStyler content={relatedResearchMarkdown} />
+                <ReactMarkdown>{relatedResearchMarkdown}</ReactMarkdown>
+              ) : (
+                <p className="text-gray-600">No related research found.</p>
+              )}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+                          <button onClick={()=>handleRelatedResearch(article.title,article.abstract)} className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                             <Lightbulb className="h-5 w-5 mr-2" />
                             Related Research
                           </button>

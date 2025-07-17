@@ -390,10 +390,7 @@ export async function fetchJournalDetailsFromAPI(journalId: string) {
     }
     return await response.json();
   } catch (error) {
-   console.log(
-      `Failed to fetch journal details for ID ${journalId}:`,
-      error
-    );
+  
     return null;
   }
 }

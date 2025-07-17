@@ -82,7 +82,6 @@ const Worldmap: React.FC<WorldmapProps> = ({ onCountryClick }) => {
   };
 
   const handleCountryClick = (countryName: string) => {
-    console.log("Country clicked in Worldmap:", countryName);
     if (typeof onCountryClick === "function") {
       onCountryClick(countryName);
     } else {

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Dialog,
@@ -13,61 +12,91 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Mail, FileText } from "lucide-react";
+import { Loader2, Mail, FileText, Lock, KeyRound } from "lucide-react";
 
 type OnOpenChangeCallback = (isOpen: boolean) => void;
 
-export default function SubmitJournalDialog({ open, onOpenChange }: { open: boolean; onOpenChange: OnOpenChangeCallback }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("email");
+export default function AuthDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: OnOpenChangeCallback;
+}) {
+  const [tab, setTab] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-
+  const [loading, setLoading] = useState(false);
   const API_BASE_URL = "https://backend.afrikajournals.org";
 
-  // Function to handle login
-  const handleLogin = async (e: React.SyntheticEvent) => {
+  const validatePassword = (password: string) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/token/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      if (tab === "signup") {
+        if (password !== confirmPassword) {
+          throw new Error("Passwords do not match.");
+        }
+        if (!validatePassword(password)) {
+          throw new Error(
+            "Password must be at least 8 characters long and include uppercase, lowercase, and a number."
+          );
+        }
+        const res = await fetch(`${API_BASE_URL}/api/register/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        if (!res.ok) throw new Error("Failed to register.");
+        console.log("Submitting login form...");
 
-      if (!response.ok) {
-        throw new Error("Invalid credentials. Please try again.");
+        window.location.assign("https://afrijour.web.app/");
       }
 
-      const data = await response.json();
-      //.log("Login successful:", data);
+      if (tab === "login") {
+        const res = await fetch(`${API_BASE_URL}/api/token/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        if (!res.ok) throw new Error("Invalid credentials.");
+        
+        window.location.assign("https://afrijour.web.app/");
+      }
 
-      onOpenChange(false); // Close dialog on success
+      if (tab === "reset") {
+        const res = await fetch(`${API_BASE_URL}/api/password-reset/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (!res.ok) throw new Error("Password reset failed.");
+        // Optional: Toast or message, but don't redirect
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Function to handle Google login (placeholder)
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-
     try {
-      // Implement Google OAuth login logic here
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      onOpenChange(false);
-    } catch (err) {
-      setError("Google login failed. Please try again.");
+      setLoading(true);
+      setError(null);
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Replace with real login
+      window.location.assign("https://afrijour.web.app/");
+    } catch {
+      setError("Google login failed. Try again.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -75,24 +104,23 @@ export default function SubmitJournalDialog({ open, onOpenChange }: { open: bool
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center">Submit Journal or Volume</DialogTitle>
+          <DialogTitle className="text-center">Access Your Journal Portal</DialogTitle>
           <DialogDescription className="text-center">
-            Log in to submit your journal or volume for review and publication.
+            Sign in, sign up, or reset your password to continue.
           </DialogDescription>
         </DialogHeader>
-
-        <Tabs defaultValue="email" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="email">Email</TabsTrigger>
-            <TabsTrigger value="google">Google</TabsTrigger>
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
+          <TabsList className="grid grid-cols-3 w-full">
+            <TabsTrigger value="login">Sign In</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="reset">Forgot Password</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="email" className="space-y-4 py-4">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+          <TabsContent value="login" className="py-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="login-email">Email</Label>
                 <Input
-                  id="email"
+                  id="login-email"
                   type="email"
                   placeholder="your@email.com"
                   value={email}
@@ -100,11 +128,10 @@ export default function SubmitJournalDialog({ open, onOpenChange }: { open: bool
                   required
                 />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+              <div>
+                <Label htmlFor="login-password">Password</Label>
                 <Input
-                  id="password"
+                  id="login-password"
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -112,72 +139,124 @@ export default function SubmitJournalDialog({ open, onOpenChange }: { open: bool
                   required
                 />
               </div>
-
               {error && <p className="text-red-500 text-sm">{error}</p>}
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Logging in...
+                    Signing in...
                   </>
                 ) : (
                   <>
                     <Mail className="mr-2 h-4 w-4" />
-                    Login with Email
+                    Sign in with Email
                   </>
                 )}
               </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="google" className="py-4">
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                Click the button below to log in with your Google account.
-              </p>
-
-              <Button onClick={handleGoogleLogin} variant="outline" className="w-full" disabled={isLoading}>
-                {isLoading ? (
+              <Button variant="outline" onClick={handleGoogleLogin} className="w-full" disabled={loading}>
+                {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Connecting...
                   </>
                 ) : (
                   <>
-                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                      <path
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                        fill="#4285F4"
-                      />
-                      <path
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                        fill="#34A853"
-                      />
-                      <path
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                        fill="#FBBC05"
-                      />
-                      <path
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                        fill="#EA4335"
-                      />
-                      <path d="M1 1h22v22H1z" fill="none" />
-                    </svg>
-                    Login with Google
+                    <img src="/google-icon.svg" className="w-4 h-4 mr-2" alt="Google" />
+                    Sign in with Google
                   </>
                 )}
               </Button>
-            </div>
+            </form>
+          </TabsContent>
+          <TabsContent value="signup" className="py-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="signup-email">Email</Label>
+                <Input
+                  id="signup-email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="signup-password">Password</Label>
+                <Input
+                  id="signup-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Must be 8+ chars, include uppercase, lowercase, and a number.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    <KeyRound className="mr-2 h-4 w-4" />
+                    Create Account
+                  </>
+                )}
+              </Button>
+            </form>
+          </TabsContent>
+          <TabsContent value="reset" className="py-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending reset link...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Send Reset Link
+                  </>
+                )}
+              </Button>
+            </form>
           </TabsContent>
         </Tabs>
-
-        <DialogFooter className="flex flex-col sm:flex-row sm:justify-between sm:space-x-2">
-          <Button variant="outline" size="sm" className="mt-4 sm:mt-0" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex flex-col sm:flex-row justify-between mt-4">
+          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-
-          <div className="flex items-center text-xs text-muted-foreground mt-4 sm:mt-0">
+          <div className="text-xs text-muted-foreground flex items-center">
             <FileText className="h-3 w-3 mr-1" />
             Need help? Contact support
           </div>

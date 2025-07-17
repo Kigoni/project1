@@ -14,6 +14,8 @@ import Testimonials from "../components/Testimonials";
 import FAQ from "../components/FAQ";
 import Footer from "../components/Footer";
 import FeedbackForm from "../components/FeedbackForm";
+import { useNavigate } from "react-router-dom";
+
 
 function Home() {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -42,6 +44,7 @@ function Home() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const navigate = useNavigate();
 
   return (
     <div className="scroll-smooth relative">
@@ -94,9 +97,10 @@ function Home() {
 
         {/* Worldmap and Stats Section */}
         <div className="flex flex-col lg:flex-row items-center justify-between px-6 lg:px-12 gap-4">
-          <div className="w-full lg:w-2/3">
-            <Worldmap />
-          </div>
+        <div className="w-full lg:w-2/3">
+        <Worldmap onCountryClick={(country) => navigate(`/journals?country=${encodeURIComponent(country)}`)} />
+        </div>
+
           <div className="w-full lg:w-1/3">
             <Stats />
           </div>

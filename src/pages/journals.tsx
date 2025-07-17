@@ -1,45 +1,43 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Hero } from "../components/Journals/hero";
 import AdvancedSearchBar from "../components/Journals/advanced-search-bar";
 import SubmitJournalDialog from "../components/Journals/submit-journal-dialog";
 import AIResearchAssistant from "../components/Journals/ai-research-assistant";
 import Navbar from "@/components/Navbar2";
 import Footer from "@/components/Footer";
-import Worldmap from "../components/WorldMap"; // Ensure correct import path
 
 export default function JournalsPage() {
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [searchParams, setSearchParams] = useState({
     query: "",
     type: "keyword",
   });
-  const [showFilters, setShowFilters] = useState(false);
+
+  const [urlSearchParams] = useSearchParams();
+  const countryFromURL = urlSearchParams.get("country");
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // ✅ Scroll to top on load
+  }, []);
+
+  useEffect(() => {
+    if (countryFromURL) {
+      setSearchParams({ query: countryFromURL, type: "country" });
+    }
+  }, [countryFromURL]);
 
   const handleSearch = (query: string, type: string) => {
     setSearchParams({ query, type });
-    // Additional search logic would go here
-  };
-
-  const handleFilterClick = () => {
-    setShowFilters(!showFilters);
   };
 
   const handleCountrySearch = (country: string) => {
-    console.log("Country clicked in JournalsPage:", country);
     setSearchParams({ query: country, type: "country" });
   };
-
-  // Automatically trigger search when country is clicked
-  useEffect(() => {
-    if (searchParams.query && searchParams.type === "country") {
-      // Auto-run search if needed
-      console.log("Search triggered for country:", searchParams.query);
-      // You can add additional search logic here if needed
-    }
-  }, [searchParams]);
 
   return (
     <main className="min-h-screen bg-gradient-to-r from-yellow-300/20 to-green-300/20">
@@ -49,12 +47,13 @@ export default function JournalsPage() {
       </div>
       <div className="container mx-auto py-10 px-4">
         <div className="space-y-6">
-          <Worldmap onCountryClick={handleCountrySearch} />
+          {/* <Worldmap onCountryClick={handleCountrySearch} /> */}
           <AdvancedSearchBar
-            initialQuery={searchParams.query}
-            searchType={searchParams.type}
-            showFilters={showFilters}
-          />
+  initialQuery={searchParams.query}
+  searchType={searchParams.type}
+  showFilters={showFilters}
+  onAISearchClick={() => setShowAIAssistant(true)}
+/>
         </div>
 
         <SubmitJournalDialog
@@ -70,10 +69,10 @@ export default function JournalsPage() {
         {/* Floating AI Assistant Button */}
         <button
           onClick={() => setShowAIAssistant(true)}
-          className="fixed bottom-6 right-6 bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-primary/90 transition-colors"
+          className="fixed bottom-6 right-6 bg-green-400 text-white rounded-full p-4 shadow-lg hover:bg-primary/90 transition-colors"
           aria-label="Research Assistant"
         >
-          <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20"></div>
+          <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20 [animation-duration:4s]"></div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

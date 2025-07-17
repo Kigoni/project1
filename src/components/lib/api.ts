@@ -375,7 +375,6 @@ export async function fetchRelatedResearch(queryParams: string): Promise<string>
       if (!content) throw new Error("No content received from OpenRouter");
 
       const relatedResearch = content;
-      console.log("Related research articles:", relatedResearch);
 
       // return relatedResearch.map((item: any): ResearchItem => ({
       //   title: item.title || "No title available",

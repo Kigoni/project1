@@ -29,8 +29,7 @@ import {
 } from "lucide-react";
 import Navbar2 from "../components/Navbar2";
 import Footer from "../components/Footer";
-import { fetchRelatedResearch, fetchResearchDetails } from "@/components/lib/api";
-import MarkdownStyler from "../components/Journals/markdownstyler";
+import { fetchRelatedResearch } from "@/components/lib/api";
 import ReactMarkdown from "react-markdown";
 
 // Types
@@ -70,16 +69,8 @@ function ArticlesPage() {
   const [selectedThematicAreas, setSelectedThematicAreas] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [countrySearch, setCountrySearch] = useState("");
-  const [showSubmissionForm, setShowSubmissionForm] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [newArticle, setNewArticle] = useState({
-    title: "",
-    abstract: "",
-    authors: "",
-    keywords: "",
-    file: null as File | null,
-  });
   const [filters, setFilters] = useState({
     Present_on_ISSN: false,
     african_index_medicus: false,
@@ -90,9 +81,7 @@ function ArticlesPage() {
     online_publisher_in_africa: false,
     open_access_journal: false,
   });
-  const [submittedArticles, setSubmittedArticles] = useState<Article[]>([]);
   const [expandedArticleId, setExpandedArticleId] = useState<number | null>(null);
-  const [articlesPerPage] = useState(15);
   const [relatedResearchMarkdown, setRelatedResearchMarkdown] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -129,11 +118,9 @@ function ArticlesPage() {
       queryParams.append("searchBy", searchMode);
       queryParams.append("page", page.toString());
       queryParams.append("page_size", pageSize.toString());
-
       Object.entries(filters).forEach(([key, value]) => {
         if (value) queryParams.append(key, "true");
       });
-
       let combinedQuery = searchQuery;
       const allFilters = [...selectedLanguages, ...selectedCountries, ...selectedThematicAreas];
       if (allFilters.length > 0) {
@@ -141,23 +128,19 @@ function ArticlesPage() {
         combinedQuery = combinedQuery ? `${combinedQuery} ${filtersString}` : filtersString;
       }
       const encodedQuery = combinedQuery.trim();
-      console.log(encodedQuery)
       if (encodedQuery) queryParams.append("query", encodedQuery);
-
       const response = await axios.get<ApiResponse>(
         `https://backend.afrikajournals.org/journal_api/articles/search/?${queryParams.toString()}`
       );
       const data = response.data;
-      console.log('data-',data)
       const mappedArticles = data.results.map((article: Article) => ({
         ...article,
         keywords: article.keywords || "",
         peer_reviewed: true,
         language: article.language || "English",
-        country: article.country || "Unknown", // Use the country from the API response
+        country: article.country || "Unknown",
         thematic_area: article.thematic_area || "",
       }));
-
       setArticles(mappedArticles);
       setFilteredArticles(mappedArticles);
       setData(data);
@@ -173,7 +156,6 @@ function ArticlesPage() {
     const delayDebounce = setTimeout(() => {
       fetchArticles();
     }, 1500); // 1.5 seconds delay
-
     return () => clearTimeout(delayDebounce);
   }, [
     searchQuery,
@@ -190,7 +172,7 @@ function ArticlesPage() {
   const handleRelatedResearch = async (title: string, description: string) => {
     const queryContent = `title:${title} description:${description}`;
     const response = await fetchRelatedResearch(queryContent);
-    setRelatedResearchMarkdown(response); 
+    setRelatedResearchMarkdown(response);
     setShowModal(true);
   };
 
@@ -199,86 +181,8 @@ function ArticlesPage() {
     setRelatedResearchMarkdown(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    if (!newArticle.title || !newArticle.abstract || !newArticle.authors) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-  
-    try {
-      const formData = new FormData();
-      formData.append("title", newArticle.title);
-      formData.append("abstract", newArticle.abstract);
-      formData.append("authors", newArticle.authors);
-      formData.append("keywords", newArticle.keywords || "");
-      if (newArticle.file) {
-        formData.append("file", newArticle.file);
-      }
-      console.log(formData)
-      const token = localStorage.getItem("authToken");
-  
-      if (!token) {
-        // New user registration
-        const registerResponse = await axios.post(
-          "https://backend.afrikajournals.org/api/register/",
-          {
-            username: newArticle.authors,
-            email: `${newArticle.authors.replace(/\s+/g, "").toLowerCase()}@example.com`,
-            password: "defaultPassword123", // Consider allowing the user to set their password
-          }
-        );
-        
-        console.log("register response",registerResponse)
-  
-        if (registerResponse.status === 201) {
-          console.log("User registered successfully:", registerResponse.data);
-          alert("User registered. Please log in and submit again.");
-        } else {
-          throw new Error("Registration failed.");
-        }
-      } else {
-        // Submit article as registered user
-        const response = await axios.post(
-          "https://backend.afrikajournals.org/journal_api/api/article/",
-          formData,
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-  
-        if (response.status === 201) {
-          alert("Article submitted successfully!");
-          setNewArticle({
-            title: "",
-            abstract: "",
-            authors: "",
-            keywords: "",
-            file: null,
-          });
-          fetchArticles(); // Refresh the list after submission
-        } else {
-          throw new Error("Article submission failed.");
-        }
-      }
-    } catch (error) {
-      console.error("Error submitting article:", error);
-      alert("An error occurred while submitting the article. Please try again.");
-    }
-  };
-  
-  
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewArticle({
-        ...newArticle,
-        file: e.target.files[0],
-      });
-    }
+  const handleSubmit = () => {
+    window.location.href = "https://afrijour.web.app/";
   };
 
   const toggleArticleExpansion = (id: number) => {
@@ -319,7 +223,6 @@ function ArticlesPage() {
             Discover, explore, and contribute to academic research across Africa
           </p>
         </header>
-
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center mb-4 space-y-4 md:space-y-0 md:space-x-4">
             <div className="flex space-x-4">
@@ -345,7 +248,6 @@ function ArticlesPage() {
               </button>
             </div>
           </div>
-
           <div className="relative flex items-center">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
@@ -378,7 +280,6 @@ function ArticlesPage() {
               </button>
             </div>
           </div>
-
           {(selectedCountries.length > 0 ||
             selectedThematicAreas.length > 0 ||
             selectedLanguages.length > 0) && (
@@ -440,7 +341,6 @@ function ArticlesPage() {
             </div>
           )}
         </div>
-
         {showFilterModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -455,7 +355,6 @@ function ArticlesPage() {
                   <X className="h-6 w-6 text-gray-600" />
                 </button>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
@@ -508,7 +407,6 @@ function ArticlesPage() {
                       ))}
                   </div>
                 </div>
-
                 <div className="bg-green-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <FileText className="h-5 w-5 mr-2 text-green-600" />
@@ -545,7 +443,6 @@ function ArticlesPage() {
                     ))}
                   </div>
                 </div>
-
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <Languages className="h-5 w-5 mr-2 text-purple-600" />
@@ -583,7 +480,6 @@ function ArticlesPage() {
                   </div>
                 </div>
               </div>
-
               <div className="mt-6 flex justify-end space-x-3">
                 <button
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
@@ -596,17 +492,10 @@ function ArticlesPage() {
                 >
                   Clear All
                 </button>
-                {/* <button
-                  className="px-4 py-2 bg-yellow-200 text-black rounded-lg hover:bg-yellow-400 transition-colors"
-                  onClick={() => fetchArticles()}
-                >
-                  Apply Filters
-                </button> */}
               </div>
             </div>
           </div>
         )}
-
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">
@@ -616,146 +505,17 @@ function ArticlesPage() {
             </h2>
             <button
               className="px-4 py-2 bg-yellow-200 text-black rounded-lg hover:bg-yellow-400 transition-colors flex items-center"
-              onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+              onClick={handleSubmit}
             >
               <PlusCircle className="h-5 w-5 mr-2" />
-              {showSubmissionForm ? "Hide Submission Form" : "Submit Article"}
+              Submit Article
             </button>
           </div>
-
-          {showSubmissionForm && (
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
-                Submit New Article
-              </h3>
-              <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Article Title*
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                      value={newArticle.title}
-                      onChange={(e) =>
-                        setNewArticle({ ...newArticle, title: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Authors (comma separated)*
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                      value={newArticle.authors}
-                      onChange={(e) =>
-                        setNewArticle({
-                          ...newArticle,
-                          authors: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Abstract*
-                  </label>
-                  <textarea
-                    className="w-full p-2 border border-gray-300 rounded-lg h-32"
-                    value={newArticle.abstract}
-                    onChange={(e) =>
-                      setNewArticle({ ...newArticle, abstract: e.target.value })
-                    }
-                    required
-                  ></textarea>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Keywords (comma separated)*
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                      value={newArticle.keywords}
-                      onChange={(e) =>
-                        setNewArticle({
-                          ...newArticle,
-                          keywords: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Upload Article (PDF)
-                    </label>
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                      onChange={handleFileChange}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-yellow-200 text-black rounded-lg hover:bg-green-700 "
-                  >
-                    Submit Article
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {submittedArticles.length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
-                Your Submitted Articles
-              </h3>
-              <div className="space-y-4">
-                {submittedArticles.map((article, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 rounded-lg p-4"
-                  >
-                    <h4 className="text-lg font-semibold text-gray-800">
-                      {article.title}
-                    </h4>
-                    <p className="text-sm text-gray-600 mb-2">
-                      Authors: {article.authors}
-                    </p>
-                    <p className="text-sm text-gray-600 mb-2">
-                      Keywords: {article.keywords}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Submitted on: {article.publication_date}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Status:{" "}
-                      <span className="text-yellow-600">Under Review</span>
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
               {error}
             </div>
           )}
-
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -822,7 +582,6 @@ function ArticlesPage() {
                         />
                       </div>
                     </div>
-
                     <div className="flex flex-wrap items-center text-sm text-gray-600 mt-2">
                       <div className="flex items-center mr-4">
                         <Hash className="h-4 w-4 mr-1" />
@@ -842,7 +601,6 @@ function ArticlesPage() {
                       </div>
                     </div>
                   </div>
-
                   {expandedArticleId === article.id && (
                     <div className="border-t border-gray-200 p-6 bg-gray-50">
                       <div className="mb-4">
@@ -851,7 +609,6 @@ function ArticlesPage() {
                         </h4>
                         <p className="text-gray-700">{article.abstract}</p>
                       </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <button className="flex items-center justify-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-yellow-200 transition-colors">
                           <Bookmark className="h-5 w-5 mr-2 text-blue-600" />
@@ -870,7 +627,6 @@ function ArticlesPage() {
                           <span>Reading Mode</span>
                         </button>
                       </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <h4 className="text-lg font-semibold text-gray-800 mb-3">
@@ -895,7 +651,6 @@ function ArticlesPage() {
                             </div>
                           </div>
                         </div>
-
                         <div>
                           <h4 className="text-lg font-semibold text-gray-800 mb-3">
                             Community & Data
@@ -920,7 +675,6 @@ function ArticlesPage() {
                           </div>
                         </div>
                       </div>
-
                       <div className="mt-6 flex justify-between">
                         <div className="flex space-x-2">
                           <button className="flex items-center px-4 py-2 bg-yellow-200 text-black rounded-lg hover:bg-blue-700 transition-colors">
@@ -934,37 +688,36 @@ function ArticlesPage() {
                         </div>
                         <div>
                           {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-3xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">Related Research</h2>
-              <button
-                onClick={closeModal}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="overflow-y-auto max-h-96">
-              {relatedResearchMarkdown ? (
-                // <MarkdownStyler content={relatedResearchMarkdown} />
-                <ReactMarkdown>{relatedResearchMarkdown}</ReactMarkdown>
-              ) : (
-                <p className="text-gray-600">No related research found.</p>
-              )}
-            </div>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-                          <button onClick={()=>handleRelatedResearch(article.title,article.abstract)} className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                              <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-3xl">
+                                <div className="flex justify-between items-center mb-4">
+                                  <h2 className="text-xl font-bold text-gray-800">Related Research</h2>
+                                  <button
+                                    onClick={closeModal}
+                                    className="text-gray-600 hover:text-gray-800"
+                                  >
+                                    <X className="h-6 w-6" />
+                                  </button>
+                                </div>
+                                <div className="overflow-y-auto max-h-96">
+                                  {relatedResearchMarkdown ? (
+                                    <ReactMarkdown>{relatedResearchMarkdown}</ReactMarkdown>
+                                  ) : (
+                                    <p className="text-gray-600">No related research found.</p>
+                                  )}
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                  <button
+                                    onClick={closeModal}
+                                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                                  >
+                                    Close
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          <button onClick={() => handleRelatedResearch(article.title, article.abstract)} className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                             <Lightbulb className="h-5 w-5 mr-2" />
                             Related Research
                           </button>
@@ -976,7 +729,6 @@ function ArticlesPage() {
               ))}
             </div>
           )}
-
           <div className="flex items-center justify-between mt-8">
             <button
               disabled={page === 1}
@@ -989,11 +741,9 @@ function ArticlesPage() {
             >
               Previous
             </button>
-
             <span className="text-gray-700">
               Page <strong>{page}</strong> of {totalPages}
             </span>
-
             <button
               disabled={!data?.next}
               onClick={() => setPage((prev) => prev + 1)}
@@ -1006,7 +756,6 @@ function ArticlesPage() {
               Next
             </button>
           </div>
-
           <div className="mt-4 text-center">
             <label htmlFor="pageSize" className="text-gray-700 mr-2">
               Results per page:
